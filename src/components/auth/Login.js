@@ -17,15 +17,24 @@ const Login = () => {
       <Box
         display="flex"
         flexDirection="column"
-        alignItems="center"
         justifyContent="center"
         height="100vh"
       >
-        <Box > 
-        <Typography variant='h4' gutterBottom>
-          Selamat Datang
+        <Box sx={{
+          display:"flex",
+          width:"100%",
+          flexDirection:"column",
+          justifyContent:"center",
+          alignItems:"center",
+          backgroundColor:"#FFF3D4",
+          p:2,
+          borderRadius:2,
+          mb:2,
+        }} > 
+        <Typography variant='h4'>
+          Selamat Datang di Aplikasi Gudang
         </Typography>
-        <Typography variant='h5'>di Aplikasi Gudang</Typography>
+        <Typography variant='h6'> Silahkan masuk untuk melanjutkan</Typography>
         </Box>
 
         <Typography variant="h4" gutterBottom>
@@ -49,23 +58,23 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <Typography variant='body1' textAlign={"right"}>
+        <Link to="#" onClick={() => console.log('Forgot Password Clicked')}>
+            Lupa Sandi?
+          </Link>
+        </Typography>
         <Button
           variant="contained"
           color="primary"
           onClick={handleLogin}
           fullWidth
-          sx={{ mt: 3 }}
+          sx={{ mt: 2, mb:2, }}
         >
           Login
         </Button>
-        <Box mt={2}>
-          <Link to="/register">Belum punya akun? Daftar</Link>
-        </Box>
-        <Box mt={1}>
-          <Link to="#" onClick={() => console.log('Forgot Password Clicked')}>
-            Lupa Sandi?
-          </Link>
-        </Box>
+        <Typography variant='body1' >Belum punya akun? 
+          <Link to="/register"> Daftar</Link>
+          </Typography>
       </Box>
     </Container>
   );

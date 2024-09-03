@@ -56,13 +56,13 @@ const Register = () => {
           color="primary"
           onClick={handleRegister}
           fullWidth
-          sx={{ mt: 3 }}
+          sx={{ mt: 2, mb:2 }}
         >
           Daftar
         </Button>
-        <Box mt={2}>
-          <Link to="/login">Sudah punya akun? Masuk</Link>
-        </Box>
+        <Typography variant='body1'>Sudah punya akun? 
+          <Link to="/login"> Masuk</Link>
+        </Typography>
       </Box>
     </Container>
   );
