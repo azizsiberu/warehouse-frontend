@@ -1,19 +1,32 @@
 // path: /src/components/auth/ForgotPasswordDialog.js
-import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 const ForgotPasswordDialog = ({ open, onClose }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleSendCode = () => {
-    // Logika untuk mengirim kode verifikasi ke email pengguna
-    console.log('Sending verification code to', email);
+    // Tambahkan logika untuk mengirim kode verifikasi ke email
+    console.log("Sending verification code to", email);
+    // Setelah mengirim kode, Anda bisa menutup dialog atau menampilkan pesan konfirmasi
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Lupa Sandi</DialogTitle>
       <DialogContent>
+        <Typography variant="body1" gutterBottom>
+          Masukkan email Anda untuk menerima kode verifikasi.
+        </Typography>
         <TextField
           label="Email"
           variant="outlined"
@@ -24,8 +37,10 @@ const ForgotPasswordDialog = ({ open, onClose }) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Batal</Button>
-        <Button onClick={handleSendCode} color="primary">
+        <Button onClick={onClose} color="secondary" variant="outlined">
+          Batal
+        </Button>
+        <Button onClick={handleSendCode} color="primary" variant="contained">
           Kirim Kode
         </Button>
       </DialogActions>

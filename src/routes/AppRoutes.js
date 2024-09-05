@@ -1,9 +1,10 @@
 // path: /src/routes/AppRoutes.js
-import { Routes, Route } from 'react-router-dom';
-import Login from '../components/auth/Login';
-import Register from '../components/auth/Register';
-import VerifyCode from '../components/auth/VerifyCode';
-import ResetPassword from '../components/auth/ResetPassword';
+import { Routes, Route } from "react-router-dom";
+import Login from "../components/auth/Login";
+import Register from "../components/auth/Register";
+import VerifyCode from "../components/auth/VerifyCode";
+import ResetPassword from "../components/auth/ResetPassword";
+import DashboardView from "../views/DashboardView";
 
 const AppRoutes = () => (
   <Routes>
@@ -11,6 +12,7 @@ const AppRoutes = () => (
     <Route path="/register" element={<Register />} />
     <Route path="/verify-code" element={<VerifyCode />} />
     <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/" element={<DashboardView />} />
     {/* Tambahkan rute lainnya di sini */}
   </Routes>
 );
