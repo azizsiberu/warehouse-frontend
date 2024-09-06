@@ -1,6 +1,8 @@
 // path: /src/App.js
 import React from "react";
 import { ThemeProvider } from "@mui/material/styles";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 import { BrowserRouter as Router } from "react-router-dom";
 import theme from "./theme/theme";
 import AppRoutes from "./routes/AppRoutes";
@@ -23,12 +25,14 @@ if (
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <AppRoutes />
-      </Router>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
+          <AppRoutes />
+        </Router>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

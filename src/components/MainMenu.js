@@ -49,7 +49,7 @@ const MainMenu = () => {
         </Typography>
         <Grid container justifyContent="center">
           {menuItems.map((item, index) => (
-            <Grid item size={3} key={index}>
+            <Grid item size={{ xs: 6, md: 3 }} key={index}>
               <MenuItem
                 icon={item.icon}
                 label={item.label}
