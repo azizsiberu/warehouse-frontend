@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HomeIcon from "@mui/icons-material/Home";
+import { MdCircleNotifications } from "react-icons/md";
 
 const CustomAppBar = ({ pageTitle }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -82,6 +83,9 @@ const CustomAppBar = ({ pageTitle }) => {
 
         {/* Right Section: Avatar and Menu */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton color="inherit" sx={{ mx: 1 }}>
+            <MdCircleNotifications size={24} />
+          </IconButton>
           <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
             <Avatar alt="User Profile" src="/static/images/avatar/1.jpg" />{" "}
             {/* Ganti dengan avatar atau placeholder */}

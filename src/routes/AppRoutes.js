@@ -1,5 +1,7 @@
 // path: /src/routes/AppRoutes.js
 import { Routes, Route, useLocation } from "react-router-dom";
+import { useState } from "react";
+
 import { Box } from "@mui/material";
 import CustomAppBar from "../components/AppBar";
 import Login from "../components/auth/Login";
@@ -9,22 +11,22 @@ import ResetPassword from "../components/auth/ResetPassword";
 import DashboardView from "../views/DashboardView";
 import ProductManagementView from "../views/ProductManagementView";
 import ProductDetails from "../components/ProductManagement/ProductDetails";
+import ReceivingManagementView from "../views/ReceivingStock";
+
+const APP_NAME = "Ajeg Gudang"; // Define your application name here
 
 const AppRoutes = () => {
   const location = useLocation();
+  const [pageTitle, setPageTitle] = useState("Warehouse Management");
+
+  const updateDocumentTitle = (pageTitle) => {
+    const fullTitle = `${pageTitle} | ${APP_NAME}`;
+    setPageTitle(pageTitle); // Update the state for AppBar
+    document.title = fullTitle; // Set the document title
+  };
 
   // Daftar halaman otentikasi di mana AppBar tidak akan ditampilkan
   const authRoutes = ["/login", "/register", "/verify-code", "/reset-password"];
-
-  // Tentukan judul halaman berdasarkan path
-  const pageTitles = {
-    "/": "Dashboard",
-    "/product-management": "Manajemen Produk",
-    // Tambahkan pageTitle lainnya jika diperlukan
-  };
-
-  // Dapatkan pageTitle berdasarkan path
-  const pageTitle = pageTitles[location.pathname] || "Warehouse Management";
 
   return (
     <>
@@ -39,16 +41,42 @@ const AppRoutes = () => {
       {/* Konten halaman */}
       <Box sx={{ padding: 2 }}>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-code" element={<VerifyCode />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/" element={<DashboardView />} />
+          <Route
+            path="/login"
+            element={<Login setPageTitle={updateDocumentTitle} />}
+          />
+          <Route
+            path="/register"
+            element={<Register setPageTitle={updateDocumentTitle} />}
+          />
+          <Route
+            path="/verify-code"
+            element={<VerifyCode setPageTitle={updateDocumentTitle} />}
+          />
+          <Route
+            path="/reset-password"
+            element={<ResetPassword setPageTitle={updateDocumentTitle} />}
+          />
+          <Route
+            path="/"
+            element={<DashboardView setPageTitle={updateDocumentTitle} />}
+          />
           <Route
             path="/product-management"
-            element={<ProductManagementView />}
+            element={
+              <ProductManagementView setPageTitle={updateDocumentTitle} />
+            }
           />
-          <Route path="/product/:id/:slug" element={<ProductDetails />} />
+          <Route
+            path="/product/:id/:slug"
+            element={<ProductDetails setPageTitle={updateDocumentTitle} />}
+          />
+          <Route
+            path="/receiving"
+            element={
+              <ReceivingManagementView setPageTitle={updateDocumentTitle} />
+            }
+          />
           {/* Tambahkan rute lainnya di sini */}
         </Routes>
       </Box>

@@ -1,6 +1,6 @@
 // path: /src/components/MainMenu.js
 import React from "react";
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import menuItems from "./MenuItems"; // Import daftar menu
 import MenuItem from "./MenuItem"; // Import komponen MenuItem
@@ -13,7 +13,7 @@ const MainMenu = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "90vh",
       }}
     >
       <Box sx={{ textAlign: "center", width: "100%", maxWidth: 800, p: 2 }}>
@@ -49,7 +49,7 @@ const MainMenu = () => {
         </Typography>
         <Grid container justifyContent="center">
           {menuItems.map((item, index) => (
-            <Grid item size={{ xs: 6, md: 3 }} key={index}>
+            <Grid size={{ xs: 6, md: 3 }} key={index}>
               <MenuItem
                 icon={item.icon}
                 label={item.label}

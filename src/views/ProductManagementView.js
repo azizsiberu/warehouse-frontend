@@ -1,9 +1,9 @@
 // path: /src/views/ProductManagementView.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProductList from "../components/ProductManagement/ProductList";
 import ProductForm from "../components/ProductManagement/ProductForm";
 
-const ProductManagementView = () => {
+const ProductManagementView = ({ setPageTitle }) => {
   const [products, setProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -12,6 +12,12 @@ const ProductManagementView = () => {
     setSelectedProduct(null);
     setIsEditing(true);
   };
+
+  useEffect(() => {
+    const title = "Product Management";
+    setPageTitle(title);
+    document.title = title;
+  }, [setPageTitle]);
 
   const handleSaveProduct = (productData) => {
     if (selectedProduct) {

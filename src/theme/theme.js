@@ -59,7 +59,7 @@ const theme = createTheme({
     },
     subtitle1: {
       fontFamily: "Open Sans",
-      fontWeight: 400,
+      fontWeight: 600,
       fontSize: "1rem", // Ukuran font untuk subtitle1
     },
     body1: {
