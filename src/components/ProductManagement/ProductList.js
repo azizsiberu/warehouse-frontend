@@ -1,3 +1,4 @@
+// path: components/ProductManagement/ProductList.js
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -29,7 +30,7 @@ const ProductList = ({ onAddProduct }) => {
   const navigate = useNavigate(); // Untuk navigasi
 
   const sortProductsByName = (products) => {
-    return [...products].sort((a, b) => a.name.localeCompare(b.name));
+    return [...products].sort((a, b) => a.nama.localeCompare(b.nama));
   };
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const ProductList = ({ onAddProduct }) => {
 
         // Mengambil kategori dari produk
         const uniqueCategories = Array.from(
-          new Set(data.map((product) => product.Category?.category))
+          new Set(data.map((product) => product.kategori))
         );
         setCategories(["All", ...uniqueCategories]); // Tambahkan "All" untuk menampilkan semua produk
       } catch (error) {
@@ -60,7 +61,7 @@ const ProductList = ({ onAddProduct }) => {
     let filtered =
       category === "All"
         ? products
-        : products.filter((product) => product.Category?.category === category);
+        : products.filter((product) => product.kategori === category);
 
     setFilteredProducts(sortProductsByName(filtered));
   };
@@ -71,18 +72,17 @@ const ProductList = ({ onAddProduct }) => {
 
     let filtered = products.filter(
       (product) =>
-        product.name.toLowerCase().includes(searchValue) &&
-        (selectedCategory === "All" ||
-          product.Category?.category === selectedCategory)
+        product.nama.toLowerCase().includes(searchValue) &&
+        (selectedCategory === "All" || product.kategori === selectedCategory)
     );
 
     setFilteredProducts(sortProductsByName(filtered));
   };
 
   const handleCardClick = (product) => {
-    const productNameSlug = product.name.replace(/\s+/g, "-").toLowerCase();
-    navigate(`/product/${product.id_product}/${productNameSlug}`, {
-      state: { id_product: product.id_product },
+    const productNameSlug = product.nama.replace(/\s+/g, "-").toLowerCase();
+    navigate(`/product/${product.id_produk}/${productNameSlug}`, {
+      state: { id_product: product.id_produk },
     });
   };
 

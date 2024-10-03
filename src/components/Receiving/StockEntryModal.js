@@ -47,15 +47,15 @@ const StockEntryModal = ({ open, onClose, productId }) => {
         ) : (
           <>
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-              <Chip label={productDetails.category} color="primary" />
+              <Chip label={productDetails.kategori} color="primary" />
               <Chip
-                label={productDetails.subcategory}
+                label={productDetails.subkategori}
                 color="primary"
                 variant="outlined"
               />
             </Stack>
             <Typography variant="h3" component="h2">
-              {productDetails?.name || "Loading..."}
+              {productDetails?.nama || "Loading..."}
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
@@ -73,7 +73,7 @@ const StockEntryModal = ({ open, onClose, productId }) => {
               <Grid item xs={12} md={6}>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
-                    {productDetails?.dimension && (
+                    {productDetails?.panjang && (
                       <Typography variant="body1" gutterBottom>
                         Dimensi
                       </Typography>
@@ -83,12 +83,12 @@ const StockEntryModal = ({ open, onClose, productId }) => {
                         Style
                       </Typography>
                     )}
-                    {productDetails?.fabric && (
+                    {productDetails?.kain && (
                       <Typography variant="body1" gutterBottom>
                         Kain
                       </Typography>
                     )}
-                    {productDetails?.leg_type && (
+                    {productDetails?.kaki && (
                       <Typography variant="body1" gutterBottom>
                         Jenis Kaki
                       </Typography>
@@ -100,9 +100,10 @@ const StockEntryModal = ({ open, onClose, productId }) => {
                     )}
                   </Grid>
                   <Grid item xs={6}>
-                    {productDetails?.dimension && (
+                    {productDetails?.panjang && (
                       <Typography variant="body1" gutterBottom>
-                        : {productDetails.dimension} cm
+                        : {productDetails.panjang} x {productDetails.lebar} x{" "}
+                        {productDetails.tinggi} cm
                       </Typography>
                     )}
                     {productDetails?.style && (
@@ -110,17 +111,17 @@ const StockEntryModal = ({ open, onClose, productId }) => {
                         : {productDetails.style}
                       </Typography>
                     )}
-                    {productDetails?.fabric && (
+                    {productDetails?.kain && (
                       <Typography variant="body1" gutterBottom>
                         : {productDetails.fabric}
                       </Typography>
                     )}
-                    {productDetails?.leg_type && (
+                    {productDetails?.kaki && (
                       <Typography variant="body1" gutterBottom>
                         : {productDetails.leg_type}
                       </Typography>
                     )}
-                    {productDetails?.seat_type && (
+                    {productDetails?.dudukan && (
                       <Typography variant="body1" gutterBottom>
                         : {productDetails.seat_type}
                       </Typography>

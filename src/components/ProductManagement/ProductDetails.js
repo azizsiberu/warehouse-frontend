@@ -52,8 +52,8 @@ const ProductDetails = ({ setPageTitle }) => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
             component="img"
-            src={productDetails.product_image}
-            alt={productDetails.name}
+            src={productDetails.foto_produk}
+            alt={productDetails.nama}
             sx={{
               width: "100%",
               aspectRatio: "1 / 1",
@@ -67,20 +67,20 @@ const ProductDetails = ({ setPageTitle }) => {
         {/* Detail Produk */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-            <Chip label={productDetails.category} color="primary" />
+            <Chip label={productDetails.kategori} color="primary" />
             <Chip
-              label={productDetails.subcategory}
+              label={productDetails.subkategori}
               color="primary"
               variant="outlined"
             />
           </Stack>
-          <Typography variant="h3">{productDetails.name}</Typography>
+          <Typography variant="h3">{productDetails.nama}</Typography>
           <Typography variant="body1" gutterBottom>
             SKU: {productDetails.sku}
           </Typography>
 
           <img
-            src={productDetails.vendorlogo}
+            src={productDetails.logo_vendor}
             alt={productDetails.vendor}
             style={{ width: 100, height: "auto", marginBottom: 10 }}
           />
@@ -92,19 +92,20 @@ const ProductDetails = ({ setPageTitle }) => {
             sx={{ fontFamily: "Open Sans" }}
           >
             Rp{" "}
-            {productDetails.selling_price
-              ? Number(productDetails.selling_price).toLocaleString("id-ID") // Konversi ke number jika diperlukan
+            {productDetails.harga_jual
+              ? Number(productDetails.harga_jual).toLocaleString("id-ID") // Konversi ke number jika diperlukan
               : "Harga tidak tersedia"}
           </Typography>
           <Box sx={{ my: 2 }}>
             <Typography variant="body1" gutterBottom>
-              {productDetails.description}
+              {productDetails.deskripsi}
             </Typography>
           </Box>
           <Typography variant="subtitle1">Spesifikasi Detail:</Typography>
 
           <Typography variant="subtitle1" gutterBottom>
-            Dimensi: {productDetails.dimension} cm
+            Dimensi: {productDetails.panjang} x {productDetails.lebar} x{" "}
+            {productDetails.tinggi} cm
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
@@ -118,17 +119,17 @@ const ProductDetails = ({ setPageTitle }) => {
                       Style
                     </Typography>
                   )}
-                  {productDetails.fabric && (
+                  {productDetails.kain && (
                     <Typography variant="body1" gutterBottom>
                       Kain
                     </Typography>
                   )}
-                  {productDetails.leg_type && (
+                  {productDetails.kaki && (
                     <Typography variant="body1" gutterBottom>
                       Jenis Kaki
                     </Typography>
                   )}
-                  {productDetails.seat_type && (
+                  {productDetails.dudukan && (
                     <Typography variant="body1" gutterBottom>
                       Jenis Dudukan
                     </Typography>
@@ -140,19 +141,19 @@ const ProductDetails = ({ setPageTitle }) => {
                       : {productDetails.style}
                     </Typography>
                   )}
-                  {productDetails.fabric && (
+                  {productDetails.kain && (
                     <Typography variant="body1" gutterBottom>
-                      : {productDetails.fabric}
+                      : {productDetails.kain}
                     </Typography>
                   )}
-                  {productDetails.seat_type && (
+                  {productDetails.kaki && (
                     <Typography variant="body1" gutterBottom>
-                      : {productDetails.seat_type}
+                      : {productDetails.kaki}
                     </Typography>
                   )}
-                  {productDetails.leg_type && (
+                  {productDetails.dudukan && (
                     <Typography variant="body1" gutterBottom>
-                      : {productDetails.leg_type}
+                      : {productDetails.dudukan}
                     </Typography>
                   )}
                 </Grid>
@@ -163,17 +164,17 @@ const ProductDetails = ({ setPageTitle }) => {
             <Grid size={{ xs: 12, md: 6 }}>
               <Grid container spacing={2}>
                 <Grid size={6}>
-                  {productDetails.throw_pillows !== undefined && (
+                  {productDetails.bantal_peluk !== undefined && (
                     <Typography variant="body1" gutterBottom>
                       Bantal Peluk
                     </Typography>
                   )}
-                  {productDetails.back_cushions !== undefined && (
+                  {productDetails.bantal_sandaran !== undefined && (
                     <Typography variant="body1" gutterBottom>
                       Bantal Sandaran
                     </Typography>
                   )}
-                  {productDetails.remote_pockets !== undefined && (
+                  {productDetails.kantong_remot !== undefined && (
                     <Typography variant="body1" gutterBottom>
                       Kantong Remote
                     </Typography>
@@ -185,19 +186,19 @@ const ProductDetails = ({ setPageTitle }) => {
                   )}
                 </Grid>
                 <Grid size={6}>
-                  {productDetails.throw_pillows !== undefined && (
+                  {productDetails.bantal_peluk !== undefined && (
                     <Typography variant="body1" gutterBottom>
-                      : {productDetails.throw_pillows}
+                      : {productDetails.bantal_peluk}
                     </Typography>
                   )}
-                  {productDetails.back_cushions !== undefined && (
+                  {productDetails.bantal_sandaran !== undefined && (
                     <Typography variant="body1" gutterBottom>
-                      : {productDetails.back_cushions}
+                      : {productDetails.bantal_sandaran}
                     </Typography>
                   )}
-                  {productDetails.remote_pockets !== undefined && (
+                  {productDetails.kantong_remot !== undefined && (
                     <Typography variant="body1" gutterBottom>
-                      : {productDetails.remote_pockets}
+                      : {productDetails.kantong_remot}
                     </Typography>
                   )}
                   {productDetails.puff !== undefined && (

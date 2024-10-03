@@ -17,40 +17,58 @@ import { getProducts } from "../../services/api";
 import useMediaQuery from "@mui/material/useMediaQuery"; // Untuk menentukan apakah di mobile atau tidak
 import Loading from "../Loading";
 import StockEntryModal from "./StockEntryModal"; // Impor modal
+import { useNavigate } from "react-router-dom"; // Untuk navigasi
 
 const ReceivingList = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const isMobile = useMediaQuery("(max-width:600px)");
-  const [loading, setLoading] = useState(true);
-
+  const [searchTerm, setSearchTerm] = useState(""); // State untuk menyimpan kata pencarian
+  const [drawerOpen, setDrawerOpen] = useState(false); // State untuk drawer
+  const isMobile = useMediaQuery("(max-width:600px)"); // Cek jika di mobile
+  const [loading, setLoading] = useState(true); // Tambahkan state untuk loading
+  const navigate = useNavigate(); // Untuk navigasi
   const [selectedProductId, setSelectedProductId] = useState(null);
+
+  const sortProductsByName = (products) => {
+    return [...products].sort((a, b) => a.nama.localeCompare(b.nama));
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false); // Untuk modal
 
   useEffect(() => {
+    // Mendapatkan daftar produk dari API
     const fetchProducts = async () => {
       try {
         const data = await getProducts();
-        setProducts(data);
-        setFilteredProducts(data);
+        const sortedData = sortProductsByName(data);
+        setProducts(sortedData);
+        setFilteredProducts(sortedData);
 
         // Mengambil kategori dari produk
         const uniqueCategories = Array.from(
-          new Set(data.map((product) => product.Category?.category))
+          new Set(data.map((product) => product.kategori))
         );
         setCategories(["All", ...uniqueCategories]); // Tambahkan "All" untuk menampilkan semua produk
       } catch (error) {
         console.error("Error fetching products:", error);
       }
-      setLoading(false);
+      setLoading(false); // Set loading ke false setelah selesai fetching
     };
 
     fetchProducts();
   }, []);
+
+  const handleFilter = (category) => {
+    setSelectedCategory(category);
+    let filtered =
+      category === "All"
+        ? products
+        : products.filter((product) => product.kategori === category);
+
+    setFilteredProducts(sortProductsByName(filtered));
+  };
 
   const handleAddStock = (productId) => {
     setSelectedProductId(productId); // Simpan id produk yang dipilih
@@ -62,28 +80,24 @@ const ReceivingList = () => {
     setSelectedProductId(null); // Reset produk yang dipilih
   };
 
-  const handleFilter = (category) => {
-    setSelectedCategory(category);
-    let filtered =
-      category === "All"
-        ? products
-        : products.filter((product) => product.Category?.category === category);
-
-    setFilteredProducts(filtered);
-  };
-
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     setSearchTerm(searchValue);
 
     let filtered = products.filter(
       (product) =>
-        product.name.toLowerCase().includes(searchValue) &&
-        (selectedCategory === "All" ||
-          product.Category?.category === selectedCategory)
+        product.nama.toLowerCase().includes(searchValue) &&
+        (selectedCategory === "All" || product.kategori === selectedCategory)
     );
 
-    setFilteredProducts(filtered);
+    setFilteredProducts(sortProductsByName(filtered));
+  };
+
+  const handleCardClick = (product) => {
+    const productNameSlug = product.nama.replace(/\s+/g, "-").toLowerCase();
+    navigate(`/product/${product.id_produk}/${productNameSlug}`, {
+      state: { id_product: product.id_produk },
+    });
   };
 
   if (loading) {
@@ -101,12 +115,10 @@ const ReceivingList = () => {
           mb={2}
           sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
         >
-          {/* Icon Hamburger untuk membuka drawer */}
           <IconButton onClick={() => setDrawerOpen(true)}>
             <MdMenu />
           </IconButton>
 
-          {/* Input pencarian produk dengan ikon search */}
           <TextField
             placeholder="Cari Produk"
             size="small"
@@ -123,11 +135,6 @@ const ReceivingList = () => {
             }}
           />
 
-          <IconButton color="primary">
-            <MdOutlineAddAPhoto />
-          </IconButton>
-
-          {/* Drawer untuk kategori dan form pencarian */}
           <Drawer
             anchor="left"
             open={drawerOpen}
@@ -138,7 +145,6 @@ const ReceivingList = () => {
               <Typography variant="h6" gutterBottom>
                 Kategori
               </Typography>
-
               <Divider sx={{ my: 2 }} />
 
               {categories.length > 0 ? (
@@ -158,7 +164,7 @@ const ReceivingList = () => {
                           ? "primary.main"
                           : "text.primary",
                       "&:hover": {
-                        textDecoration: "underline", // Menambahkan underline saat hover
+                        textDecoration: "underline",
                       },
                     }}
                   >
@@ -174,17 +180,16 @@ const ReceivingList = () => {
           </Drawer>
         </Box>
       ) : (
-        // Tampilan untuk Desktop
         <Box
           display="flex"
           alignItems="center"
-          justifyContent="space-between" // Untuk memisahkan elemen kiri dan kanan
+          justifyContent="space-between"
           mb={2}
           sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
         >
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
             <Typography variant="h4" sx={{ marginRight: 2 }}>
-              Daftar Penerimaan Barang
+              Daftar Produk
             </Typography>
 
             <TextField
@@ -207,7 +212,6 @@ const ReceivingList = () => {
         </Box>
       )}
 
-      {/* Daftar Kategori */}
       {!isMobile && (
         <Box display="flex" gap={1} mb={2} flexWrap="wrap">
           {categories.length > 0 ? (
@@ -256,7 +260,6 @@ const ReceivingList = () => {
           </Typography>
         )}
       </Box>
-
       {/* Modal untuk menambah stok */}
       <StockEntryModal
         open={isModalOpen}
@@ -266,5 +269,4 @@ const ReceivingList = () => {
     </Box>
   );
 };
-
 export default ReceivingList;

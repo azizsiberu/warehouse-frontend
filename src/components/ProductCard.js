@@ -20,8 +20,8 @@ const ProductCard = ({ product, buttonLabel, onClick }) => {
       <CardMedia
         component="img"
         height="200"
-        image={product.product_image}
-        alt={product.name}
+        image={product.foto_produk}
+        alt={product.nama}
         onClick={onClick} // Navigasi atau fungsi lain di-handle dari parent
         sx={{ cursor: "pointer" }}
       />
@@ -37,12 +37,12 @@ const ProductCard = ({ product, buttonLabel, onClick }) => {
             width: "100%",
           }}
         >
-          {product.name}
+          {product.nama}
         </Typography>
 
         <Typography variant="body2" color="text.secondary">
-          {product.Category?.category || "Kategori tidak tersedia"} |{" "}
-          {product.SubCategory?.subkategori || "Subkategori tidak tersedia"}
+          {product.kategori || "Kategori tidak tersedia"} |{" "}
+          {product.subkategori || "Subkategori tidak tersedia"}
         </Typography>
 
         <Box sx={{ mt: 1 }}>
@@ -52,14 +52,14 @@ const ProductCard = ({ product, buttonLabel, onClick }) => {
             sx={{ fontFamily: "Open Sans" }}
           >
             Rp{" "}
-            {product.selling_price
-              ? Number(product.selling_price).toLocaleString("id-ID")
+            {product.harga_jual
+              ? Number(product.harga_jual).toLocaleString("id-ID")
               : "Harga tidak tersedia"}
           </Typography>
         </Box>
 
         <Typography variant="body2" color="text.secondary">
-          Vendor: {product.Vendor?.vendor_name || "Vendor tidak tersedia"}
+          Vendor: {product.vendor || "Vendor tidak tersedia"}
         </Typography>
 
         {/* Tambahkan tombol khusus di sini */}
