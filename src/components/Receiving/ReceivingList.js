@@ -28,14 +28,14 @@ const ReceivingList = () => {
   const [drawerOpen, setDrawerOpen] = useState(false); // State untuk drawer
   const isMobile = useMediaQuery("(max-width:600px)"); // Cek jika di mobile
   const [loading, setLoading] = useState(true); // Tambahkan state untuk loading
-  const navigate = useNavigate(); // Untuk navigasi
-  const [selectedProductId, setSelectedProductId] = useState(null);
-
+  const navigate = useNavigate(); // Untuk navigasi  
   const sortProductsByName = (products) => {
     return [...products].sort((a, b) => a.nama.localeCompare(b.nama));
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Untuk modal
+
+  const [isModalOpen, setIsModalOpen] = useState(false); // Untuk mengelola buka/tutup modal
+  const [selectedProductId, setSelectedProductId] = useState(null); // Menyimpan ID produk yang dipilih
 
   useEffect(() => {
     // Mendapatkan daftar produk dari API
@@ -71,9 +71,11 @@ const ReceivingList = () => {
   };
 
   const handleAddStock = (productId) => {
-    setSelectedProductId(productId); // Simpan id produk yang dipilih
-    setIsModalOpen(true); // Buka modal
+    console.log("Opening modal for product ID:", productId); // Debugging
+    setSelectedProductId(productId);
+    setIsModalOpen(true);
   };
+  
 
   const handleCloseModal = () => {
     setIsModalOpen(false); // Tutup modal
@@ -249,8 +251,8 @@ const ReceivingList = () => {
                 <ProductCard
                   product={product}
                   buttonLabel="Tambah Stok"
-                  onClick={() => handleAddStock(product.id_product)} // Panggil modal saat tombol diklik
-                />
+                  onClick={() => handleAddStock(product.id_produk)}
+                  />
               </Grid>
             ))}
           </Grid>

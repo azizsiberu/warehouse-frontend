@@ -26,4 +26,34 @@ export const updateProduct = async (id, productData) => {
   return response.data;
 };
 
+// Fungsi untuk mendapatkan semua data kain
+export const getKainAttributes = async () => {
+  const response = await api.get("/api/attributes/kain");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan semua data kaki
+export const getKakiAttributes = async () => {
+  const response = await api.get("/api/attributes/kaki");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan semua data dudukan
+export const getDudukanAttributes = async () => {
+  const response = await api.get("/api/attributes/dudukan");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan atribut warna berdasarkan id_kain
+export const getWarnaByKainId = async (id_kain) => {
+  const response = await api.get(`/api/attributes/warna/${id_kain}`);
+  return response.data; // Kembalikan data dari API
+};
+
+// Fungsi untuk mendapatkan semua finishing
+export const getFinishingAttributes = async () => {
+  const response = await api.get(`/api/attributes/finishing`);
+  return response.data; // Kembalikan data dari API
+};
+
 export default api;
