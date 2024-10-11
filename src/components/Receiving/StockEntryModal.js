@@ -1,5 +1,5 @@
 // path: /src/components/Receiving/StockEntryModal.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Modal,
@@ -18,14 +18,16 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useDispatch, useSelector } from "react-redux"; // Jika menggunakan Redux
-import {  fetchProductById,
+import {
+  fetchProductById,
   fetchKainAttributes,
   fetchKakiAttributes,
-  fetchDudukanAttributes, } from "../../redux/reducers/productReducer"; // Action untuk mengambil produk berdasarkan ID
+  fetchDudukanAttributes,
+  fetchWarnaByKainId,
+  fetchFinishingAttributes,
+} from "../../redux/reducers/productReducer"; // Action untuk mengambil produk berdasarkan ID
 import Loading from "../Loading"; // Jika ada animasi loading
-import { MdAdd, MdRemove, MdDelete  } from "react-icons/md"; // Import icons from react-icons
-
-
+import { MdAdd, MdRemove, MdDelete } from "react-icons/md"; // Import icons from react-icons
 
 const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   const dispatch = useDispatch();
@@ -33,43 +35,92 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   const [newStock, setNewStock] = useState(""); // Untuk input stok baru
   const [errorMessage, setErrorMessage] = useState(""); // Pesan error jika input tidak valid
 
-   // State untuk custom entries
-   const [additionalOptions, setAdditionalOptions] = useState([{ jenis: "", nilai: "" }]);
-   const [validationErrors, setValidationErrors] = useState({});
-
-    // State untuk menyimpan pilihan terakhir
-  const [selectedKain, setSelectedKain] = useState(null);  // Pilihan kain untuk fetch warna nanti
-  const [selectedKaki, setSelectedKaki] = useState(null);
-  const [selectedDudukan, setSelectedDudukan] = useState(null);
- 
-   // Ambil data atribut dari Redux store
-   const kainAttributes = useSelector((state) => state.products.kainAttributes);
-   const kakiAttributes = useSelector((state) => state.products.kakiAttributes);
-   const dudukanAttributes = useSelector((state) => state.products.dudukanAttributes);
- 
-
-  const { productDetails, loading, error } = useSelector(
-    (state) => state.products
-  ); // Mengambil data produk dari Redux
   const [quantity, setQuantity] = useState(1); // Default value of 1
 
+  // State untuk custom entries
+  const [additionalOptions, setAdditionalOptions] = useState([
+    { jenis: "", nilai: "" },
+  ]);
+  const [validationErrors, setValidationErrors] = useState({});
 
-  const handleIncrement = () => {
+  // State untuk menyimpan pilihan terakhir
+  const [selectedKain, setSelectedKain] = useState(null); // Pilihan kain untuk fetch warna nanti
+  const [selectedKaki, setSelectedKaki] = useState(null);
+  const [selectedDudukan, setSelectedDudukan] = useState(null);
+
+  const [selectedWarna, setSelectedWarna] = useState("");
+
+  // Ambil data dari Redux Store
+  const kainAttributes = useSelector((state) => state.products.kainAttributes);
+  const kakiAttributes = useSelector((state) => state.products.kakiAttributes);
+  const dudukanAttributes = useSelector(
+    (state) => state.products.dudukanAttributes
+  );
+  const warnaOptions = useSelector((state) => state.products.warnaOptions);
+  const finishingOptions = useSelector(
+    (state) => state.products.finishingOptions
+  );
+  const { productDetails, loading, error } = useSelector(
+    (state) => state.products
+  );
+
+  // Fetch semua data saat modal dibuka
+  useEffect(() => {
+    if (open) {
+      if (productId) {
+        dispatch(fetchProductById(productId));
+      }
+      dispatch(fetchKainAttributes());
+      dispatch(fetchKakiAttributes());
+      dispatch(fetchDudukanAttributes());
+      dispatch(fetchFinishingAttributes());
+    }
+  }, [dispatch, open, productId]);
+
+  // Fetch warna berdasarkan kainId dari produk atau custom
+  useEffect(() => {
+    let kainId = null;
+
+    // Ambil kainId dari productDetails
+    if (productDetails && productDetails.id_kain) {
+      kainId = productDetails.id_kain;
+    }
+
+    // Ambil kainId dari custom produk jika ada
+    const selectedCustomKain = additionalOptions.find(
+      (option) => option.jenis === "Kain"
+    );
+    if (selectedCustomKain && selectedCustomKain.nilai) {
+      kainId = selectedCustomKain.nilai;
+    }
+
+    // Fetch warna jika kainId ditemukan
+    if (kainId) {
+      dispatch(fetchWarnaByKainId(kainId));
+    }
+  }, [dispatch, productDetails, additionalOptions]);
+
+  const handleIncrement = useCallback(() => {
     setQuantity((prevQuantity) => prevQuantity + 1);
-  };
+  }, []);
 
-  const handleDecrement = () => {
+  const handleDecrement = useCallback(() => {
     if (quantity > 1) {
       setQuantity((prevQuantity) => prevQuantity - 1);
     }
-  };
+  }, [quantity]);
 
-  // Memanggil produk berdasarkan ID ketika modal dibuka
-  useEffect(() => {
-    if (open && productId) {
-      dispatch(fetchProductById(productId)); // Memanggil action untuk mengambil detail produk berdasarkan ID
+  const handleStockSubmit = useCallback(() => {
+    const stockValue = parseInt(newStock, 10);
+
+    if (isNaN(stockValue) || stockValue <= 0) {
+      setErrorMessage("Masukkan jumlah stok yang valid (harus lebih dari 0).");
+      return;
     }
-  }, [dispatch, open, productId]);
+
+    onSubmit(stockValue);
+    onClose();
+  }, [newStock, onSubmit, onClose]);
 
   useEffect(() => {
     if (open) {
@@ -80,20 +131,6 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
 
   const handleStockChange = (event) => {
     setNewStock(event.target.value);
-  };
-
-  const handleStockSubmit = () => {
-    const stockValue = parseInt(newStock, 10);
-
-    // Validasi input stok
-    if (isNaN(stockValue) || stockValue <= 0) {
-      setErrorMessage("Masukkan jumlah stok yang valid (harus lebih dari 0).");
-      return;
-    }
-
-    // Panggil fungsi onSubmit dengan nilai stok baru
-    onSubmit(stockValue);
-    onClose(); // Tutup modal setelah submit
   };
 
   // Fungsi untuk menambahkan row custom baru
@@ -113,39 +150,47 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   };
 
   // Fungsi untuk menangani perubahan pada setiap kolom custom
-  const handleAdditionalChange = (index, field, value) => {
-    const updatedOptions = additionalOptions.map((option, i) =>
-      i === index ? { ...option, [field]: value } : option
-    );
-    setAdditionalOptions(updatedOptions);
-
-    // Fetch data secara kondisional berdasarkan pilihan
-    if (field === "jenis") {
-      if (value === "Kain") {
-        dispatch(fetchKainAttributes()); // Fetch kain hanya ketika dipilih
-      } else if (value === "Kaki") {
-        dispatch(fetchKakiAttributes()); // Fetch kaki hanya ketika dipilih
-      } else if (value === "Dudukan") {
-        dispatch(fetchDudukanAttributes()); // Fetch dudukan hanya ketika dipilih
-      }
-    }
-  };
+  const handleAdditionalChange = useCallback(
+    (index, field, value) => {
+      const updatedOptions = additionalOptions.map((option, i) =>
+        i === index ? { ...option, [field]: value } : option
+      );
+      setAdditionalOptions(updatedOptions);
+    },
+    [additionalOptions]
+  );
 
   // Fungsi untuk mendapatkan opsi berdasarkan jenis yang dipilih
-const getOptionsForJenis = (jenis) => {
-  switch (jenis) {
-    case "Kain":
-      return kainAttributes.map(attr => ({ id: attr.id_kain, nama: attr.kain }));
-    case "Kaki":
-      return kakiAttributes.map(attr => ({ id: attr.id_kaki, nama: attr.jenis_kaki }));
-    case "Dudukan":
-      return dudukanAttributes.map(attr => ({ id: attr.id_dudukan, nama: attr.dudukan }));
-    default:
-      return [];
-  }
-};
+  const getOptionsForJenis = useMemo(
+    () => (jenis) => {
+      switch (jenis) {
+        case "Kain":
+          return kainAttributes.map((attr) => ({
+            id: attr.id_kain,
+            nama: attr.kain,
+          }));
+        case "Kaki":
+          return kakiAttributes.map((attr) => ({
+            id: attr.id_kaki,
+            nama: attr.jenis_kaki,
+          }));
+        case "Dudukan":
+          return dudukanAttributes.map((attr) => ({
+            id: attr.id_dudukan,
+            nama: attr.dudukan,
+          }));
+        default:
+          return [];
+      }
+    },
+    [kainAttributes, kakiAttributes, dudukanAttributes]
+  );
 
-
+  const optionsList = useMemo(() => {
+    return additionalOptions.map((option) => {
+      return getOptionsForJenis(option.jenis);
+    });
+  }, [additionalOptions]);
 
   if (loading) {
     return <Loading />; // Tampilkan animasi loading saat data sedang diambil
@@ -164,13 +209,12 @@ const getOptionsForJenis = (jenis) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           maxHeight: 700,
-          width: { xs: "90%", sm: "80%", md: "600px" }, // Responsif berdasarkan ukuran layar
+          width: { xs: "90%", sm: "80%", md: "600px" },
           bgcolor: "background.paper",
           borderRadius: 2,
           p: 3,
           boxShadow: 24,
-          overflowY: "auto", // Add scroll if content overflows
-
+          overflowY: "auto",
         }}
       >
         <Typography id="modal-title" variant="h6" component="h2" mb={2}>
@@ -182,67 +226,72 @@ const getOptionsForJenis = (jenis) => {
         {productDetails && (
           <Box mt={2}>
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-            <Chip label={productDetails.kategori} color="primary" />
-            <Chip
-              label={productDetails.subkategori}
-              color="primary"
-              variant="outlined"
-            />
-          </Stack>
-          <Grid container alignItems="center" >
-            <Grid size={{xs:12, md:8 }}>
-            <Typography variant="h5" >
-                  {productDetails.nama}
-                </Typography>
+              <Chip label={productDetails.kategori} color="primary" />
+              <Chip
+                label={productDetails.subkategori}
+                color="primary"
+                variant="outlined"
+              />
+            </Stack>
+            <Grid container alignItems="center">
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Typography variant="h5">{productDetails.nama}</Typography>
                 <Typography variant="body1">
                   <strong>SKU:</strong> {productDetails.sku}
                 </Typography>
-
-            </Grid>
-            <Grid size={{xs:12, md:4 }} textAlign="left">
-            <Box  alignItems="center" justifyContent="center" mt={1}>
-            <Typography>
-                Jumlah
-              </Typography>
-              <Box display="flex" alignItems="center"
-                          justifyContent="flex-start"  mt={1}>
-            <IconButton onClick={handleDecrement} color="primary" sx={{
-                border: '1px solid', 
-                borderColor: 'primary.main',
-                borderRadius: '4px', 
-                padding: '5px', 
-              }}>
-              <MdRemove />
-            </IconButton>
-            <Typography variant="h6" sx={{ mx: 2 }}>
-              {quantity}
-            </Typography>
-            <IconButton onClick={handleIncrement} color="primary" sx={{
-                border: '1px solid', 
-                borderColor: 'primary.main',
-                borderRadius: '4px', 
-                padding: '5px',
-              }}>
-              <MdAdd />
-            </IconButton>
-          </Box>
-          </Box>
-            </Grid>
-          </Grid>
-            
-                <Box sx={{mt:2}}>
-                <Typography variant="subtitle1">Spesifikasi Detail:</Typography>
-                
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }} textAlign="left">
+                <Box alignItems="center" justifyContent="center" mt={1}>
+                  <Typography>Jumlah</Typography>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    mt={1}
+                  >
+                    <IconButton
+                      onClick={handleDecrement}
+                      color="primary"
+                      sx={{
+                        border: "1px solid",
+                        borderColor: "primary.main",
+                        borderRadius: "4px",
+                        padding: "5px",
+                      }}
+                    >
+                      <MdRemove />
+                    </IconButton>
+                    <Typography variant="h6" sx={{ mx: 2 }}>
+                      {quantity}
+                    </Typography>
+                    <IconButton
+                      onClick={handleIncrement}
+                      color="primary"
+                      sx={{
+                        border: "1px solid",
+                        borderColor: "primary.main",
+                        borderRadius: "4px",
+                        padding: "5px",
+                      }}
+                    >
+                      <MdAdd />
+                    </IconButton>
+                  </Box>
                 </Box>
+              </Grid>
+            </Grid>
+
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1">Spesifikasi Detail:</Typography>
+            </Box>
             <Grid container spacing={2}>
               {/* Spesifikasi Produk */}
-              <Grid item size={{xs:12, md:6}}>
-                
+              <Grid item size={{ xs: 12, md: 6 }}>
                 <Grid container spacing={2}>
                   <Grid item size={6}>
-                      <Typography variant="body2" gutterBottom>
-                        Ukuran
-                      </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      Ukuran
+                    </Typography>
                     {productDetails.kain && (
                       <Typography variant="body2" gutterBottom>
                         Kain
@@ -250,7 +299,7 @@ const getOptionsForJenis = (jenis) => {
                     )}
                     {productDetails.kaki && (
                       <Typography variant="body2" gutterBottom>
-                       Jenis Kaki
+                        Jenis Kaki
                       </Typography>
                     )}
                     {productDetails.dudukan && (
@@ -260,11 +309,10 @@ const getOptionsForJenis = (jenis) => {
                     )}
                   </Grid>
                   <Grid item size={6}>
-                    
-                      <Typography variant="body2" gutterBottom>
-                        : {productDetails.panjang} x{" "}
-                        {productDetails.lebar} x {productDetails.tinggi} cm
-                      </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      : {productDetails.panjang} x {productDetails.lebar} x{" "}
+                      {productDetails.tinggi} cm
+                    </Typography>
                     {productDetails.kain && (
                       <Typography variant="body2" gutterBottom>
                         : {productDetails.kain}
@@ -285,47 +333,47 @@ const getOptionsForJenis = (jenis) => {
               </Grid>
 
               {/* Atribut Tambahan */}
-              <Grid item size={{xs:12, md:6}}>
+              <Grid item size={{ xs: 12, md: 6 }}>
                 <Grid container spacing={2}>
-                <Grid item size={6}>
-                {productDetails.bantal_peluk  && (
+                  <Grid item size={6}>
+                    {productDetails.bantal_peluk && (
                       <Typography variant="body2" gutterBottom>
-                       Bantal Peluk
+                        Bantal Peluk
                       </Typography>
                     )}
-                    {productDetails.bantal_sandaran  && (
+                    {productDetails.bantal_sandaran && (
                       <Typography variant="body2" gutterBottom>
-                       Bantal Sandaran
+                        Bantal Sandaran
                       </Typography>
                     )}
-                    {productDetails.kantong_remot !== 0  && (
+                    {productDetails.kantong_remot && (
                       <Typography variant="body2" gutterBottom>
                         Kantong Remote
                       </Typography>
                     )}
-                    {productDetails.puff  && (
+                    {productDetails.puff && (
                       <Typography variant="body2" gutterBottom>
                         Puff
                       </Typography>
                     )}
                   </Grid>
                   <Grid item size={6}>
-                    {productDetails.bantal_peluk  && (
+                    {productDetails.bantal_peluk && (
                       <Typography variant="body2" gutterBottom>
                         : {productDetails.bantal_peluk}
                       </Typography>
                     )}
-                    {productDetails.bantal_sandaran  && (
+                    {productDetails.bantal_sandaran && (
                       <Typography variant="body2" gutterBottom>
                         : {productDetails.bantal_sandaran}
                       </Typography>
                     )}
-                    {productDetails.kantong_remot !== 0  && (
+                    {productDetails.kantong_remot && (
                       <Typography variant="body2" gutterBottom>
                         : {productDetails.kantong_remot}
                       </Typography>
                     )}
-                    {productDetails.puff  && (
+                    {productDetails.puff && (
                       <Typography variant="body2" gutterBottom>
                         : {productDetails.puff ? "Ya" : "Tidak"}
                       </Typography>
@@ -338,122 +386,246 @@ const getOptionsForJenis = (jenis) => {
         )}
 
         {/* Custom Section */}
-        <Box component="ul" p={1} m={0} sx={{ border: "1px solid #ccc", borderRadius: 2, mt: 1 }}>
-          <Typography variant="subtitle1" >Custom Produk</Typography>
-      <Grid container spacing={1}>
-        <Grid item size={4}>
-          <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>
-            Jenis
-          </Typography>
-        </Grid>
-        <Grid item size={4}>
-          <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>
-            Nilai
-          </Typography>
-        </Grid>
-        <Grid item size={4}>
-          <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>
-            Hapus
-          </Typography>
-          </Grid>
-        {additionalOptions.map((option, index) => (
-          <React.Fragment key={index}>
-            <Grid item size={4}>
-  <FormControl fullWidth size="small">
-    <InputLabel id={`jenis-label-${index}`}>Pilih Jenis</InputLabel>
-    <Select
-      labelId={`jenis-label-${index}`}
-      value={option.jenis}
-      label="Pilih Jenis"
-      onChange={(event) => handleAdditionalChange(index, "jenis", event.target.value)}
-    >
-      <MenuItem value="Kain">Kain</MenuItem>
-      <MenuItem value="Kaki">Kaki</MenuItem>
-      <MenuItem value="Dudukan">Dudukan</MenuItem>
-      <MenuItem value="Dimensi">Dimensi</MenuItem>
-      <MenuItem value="Bantal Peluk">Bantal Peluk</MenuItem>
-      <MenuItem value="Bantal Sandaran">Bantal Sandaran</MenuItem>
-      <MenuItem value="Kantong Remote">Kantong Remote</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>
+        <Box
+          component="ul"
+          p={1}
+          m={0}
+          sx={{ border: "1px solid #ccc", borderRadius: 2, mt: 1 }}
+        >
+          <Typography variant="subtitle1">Custom Produk</Typography>
+          <Grid container spacing={1}>
+            <Grid item size={5}>
+              <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>
+                Jenis
+              </Typography>
+            </Grid>
+            <Grid item size={5}>
+              <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>
+                Nilai
+              </Typography>
+            </Grid>
+            <Grid item size={2}>
+              <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>
+                Hapus
+              </Typography>
+            </Grid>
+            {additionalOptions.map((option, index) => (
+              <React.Fragment key={index}>
+                <Grid item size={5}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel id={`jenis-label-${index}`}>
+                      Pilih Jenis
+                    </InputLabel>
+                    <Select
+                      labelId={`jenis-label-${index}`}
+                      value={option.jenis}
+                      label="Pilih Jenis"
+                      onChange={(event) =>
+                        handleAdditionalChange(
+                          index,
+                          "jenis",
+                          event.target.value
+                        )
+                      }
+                    >
+                      <MenuItem value="Ukuran">Ukuran</MenuItem>
+                      {productDetails?.kain && (
+                        <MenuItem value="Kain">Kain</MenuItem>
+                      )}
+                      {productDetails?.kaki && (
+                        <MenuItem value="Kaki">Kaki</MenuItem>
+                      )}
+                      {productDetails?.dudukan && (
+                        <MenuItem value="Dudukan">Dudukan</MenuItem>
+                      )}
+                      {productDetails?.bantal_peluk && (
+                        <MenuItem value="Bantal Peluk">Bantal Peluk</MenuItem>
+                      )}
+                      {productDetails?.bantal_sandaran && (
+                        <MenuItem value="Bantal Sandaran">
+                          Bantal Sandaran
+                        </MenuItem>
+                      )}
+                      {productDetails?.id_jenis == 1 && (
+                        <MenuItem value="Kantong Remote">
+                          Kantong Remote
+                        </MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
 
-<Grid item size={4}>
-                  {["Dimensi", "Bantal Peluk", "Bantal Sandaran", "Kantong Remote"].includes(
-                    option.jenis
-                  ) ? (
+                <Grid item size={5}>
+                  {[
+                    "Ukuran",
+                    "Bantal Peluk",
+                    "Bantal Sandaran",
+                    "Kantong Remote",
+                  ].includes(option.jenis) ? (
                     <TextField
                       fullWidth
                       size="small"
                       value={option.nilai}
                       onChange={(event) =>
-                        handleAdditionalChange(index, "nilai", event.target.value)
+                        handleAdditionalChange(
+                          index,
+                          "nilai",
+                          event.target.value
+                        )
                       }
-                      placeholder="Masukkan nilai"
+                      placeholder={`Masukkan ${option.jenis}`}
                     />
                   ) : (
                     <FormControl
                       fullWidth
                       size="small"
-                      error={!!validationErrors[`additionalOptions[${index}].nilai`]}
+                      error={
+                        !!validationErrors[`additionalOptions[${index}].nilai`]
+                      }
                     >
-                      <InputLabel id={`nilai-label-${index}`}>Pilih Nilai</InputLabel>
+                      <InputLabel id={`nilai-label-${index}`}>
+                        Pilih Nilai
+                      </InputLabel>
                       <Select
                         labelId={`nilai-label-${index}`}
                         value={option.nilai}
                         label="Pilih Nilai"
                         onChange={(event) =>
-                          handleAdditionalChange(index, "nilai", event.target.value)
+                          handleAdditionalChange(
+                            index,
+                            "nilai",
+                            event.target.value
+                          )
                         }
                       >
-                        {getOptionsForJenis(option.jenis).map((opt) => (
+                        {optionsList[index].map((opt) => (
                           <MenuItem key={opt.id} value={opt.id}>
                             {opt.nama}
                           </MenuItem>
                         ))}
                       </Select>
-                      {validationErrors[`additionalOptions[${index}].nilai`] && (
+                      {validationErrors[
+                        `additionalOptions[${index}].nilai`
+                      ] && (
                         <FormHelperText>
-                          {validationErrors[`additionalOptions[${index}].nilai`]}
+                          {
+                            validationErrors[
+                              `additionalOptions[${index}].nilai`
+                            ]
+                          }
                         </FormHelperText>
                       )}
                     </FormControl>
                   )}
                 </Grid>
 
+                <Grid item size={2} display="flex">
+                  <IconButton
+                    onClick={() => removeAdditionalOption(index)}
+                    color="error"
+                    aria-label="delete"
+                  >
+                    <MdDelete />
+                  </IconButton>
+                </Grid>
+              </React.Fragment>
+            ))}
+          </Grid>
 
-            {/* Tombol Hapus */}
-            <Grid item size={4} display="flex">
-              <IconButton onClick={() => removeAdditionalOption(index)} color="error" aria-label="delete">
-                <MdDelete />
-              </IconButton>
+          {/* Tombol Tambah Pilihan dan Hapus Semua */}
+          <Grid container spacing={1}>
+            <Grid item size={6}>
+              <Button
+                onClick={addAdditionalOption}
+                variant="contained"
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                Tambah Pilihan
+              </Button>
             </Grid>
-          </React.Fragment>
-        ))}
-      </Grid>
+            <Grid item size={6}>
+              <Button
+                onClick={clearAllAdditionalOptions}
+                variant="outlined"
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                Hapus Semua
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
 
-      {/* Tombol Tambah Pilihan dan Hapus Semua */}
-      <Grid container spacing={1}>
-        <Grid item size={6}>
-          <Button onClick={addAdditionalOption} variant="contained" fullWidth sx={{ mt: 1 }}>
-            Tambah Pilihan
-          </Button>
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          {/* Pilihan Warna */}
+          {productDetails?.id_kain && (
+            <Grid item size={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Pilih Warna</InputLabel>
+                <Select
+                  label="Pilih Warna"
+                  value={selectedWarna || ""}
+                  onChange={(event) => setSelectedWarna(event.target.value)}
+                >
+                  {warnaOptions.length > 0 ? (
+                    warnaOptions.map((warna) => (
+                      <MenuItem key={warna.id_warna} value={warna.id_warna}>
+                        {warna.warna}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value="">Pilih Kain terlebih dahulu</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+
+          {/* Pilihan Finishing */}
+          {(productDetails?.id_jenis === 2 ||
+            productDetails?.kaki === "Skandinavian" ||
+            productDetails?.kaki === "Balok Kayu" ||
+            additionalOptions.some(
+              (option) =>
+                option.jenis === "Kaki" &&
+                ["Skandinavian", "Balok Kayu"].includes(
+                  kakiAttributes.find((kaki) => kaki.id_kaki === option.nilai)
+                    ?.jenis_kaki
+                )
+            )) && (
+            <Grid item size={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Finishing</InputLabel>
+                <Select label="Finishing">
+                  {finishingOptions.length > 0 ? (
+                    finishingOptions.map((finishing) => (
+                      <MenuItem
+                        key={finishing.id_finishing}
+                        value={finishing.id_finishing}
+                      >
+                        {finishing.finishing}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value="">Loading...</MenuItem> // Jika finishing belum ada
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
         </Grid>
-        <Grid item size={6}>
-          <Button onClick={clearAllAdditionalOptions} variant="outlined" fullWidth sx={{ mt: 1 }}>
-            Hapus Semua
-          </Button>
-        </Grid>
-      </Grid>
-    </Box>
-       
 
         {/* Tombol Submit dan Cancel */}
         <Box mt={3} display="flex" justifyContent="space-between">
           <Button variant="outlined" color="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={handleStockSubmit}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleStockSubmit}
+          >
             Submit
           </Button>
         </Box>
@@ -462,4 +634,4 @@ const getOptionsForJenis = (jenis) => {
   );
 };
 
-export default StockEntryModal;
+export default React.memo(StockEntryModal);
