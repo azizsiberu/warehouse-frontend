@@ -17,6 +17,7 @@ import { getProducts } from "../../services/api";
 import useMediaQuery from "@mui/material/useMediaQuery"; // Untuk menentukan apakah di mobile atau tidak
 import Loading from "../Loading";
 import StockEntryModal from "./StockEntryModal"; // Impor modal
+import RightDrawer from "./RightDrawer";
 import { useNavigate } from "react-router-dom"; // Untuk navigasi
 
 const ReceivingList = () => {
@@ -28,14 +29,15 @@ const ReceivingList = () => {
   const [drawerOpen, setDrawerOpen] = useState(false); // State untuk drawer
   const isMobile = useMediaQuery("(max-width:600px)"); // Cek jika di mobile
   const [loading, setLoading] = useState(true); // Tambahkan state untuk loading
-  const navigate = useNavigate(); // Untuk navigasi  
+  const navigate = useNavigate(); // Untuk navigasi
   const sortProductsByName = (products) => {
     return [...products].sort((a, b) => a.nama.localeCompare(b.nama));
   };
 
-
   const [isModalOpen, setIsModalOpen] = useState(false); // Untuk mengelola buka/tutup modal
   const [selectedProductId, setSelectedProductId] = useState(null); // Menyimpan ID produk yang dipilih
+
+  const [selectedProducts, setSelectedProducts] = useState([]); // Daftar produk yang dipilih
 
   useEffect(() => {
     // Mendapatkan daftar produk dari API
@@ -75,7 +77,6 @@ const ReceivingList = () => {
     setSelectedProductId(productId);
     setIsModalOpen(true);
   };
-  
 
   const handleCloseModal = () => {
     setIsModalOpen(false); // Tutup modal
@@ -252,7 +253,7 @@ const ReceivingList = () => {
                   product={product}
                   buttonLabel="Tambah Stok"
                   onClick={() => handleAddStock(product.id_produk)}
-                  />
+                />
               </Grid>
             ))}
           </Grid>
@@ -268,6 +269,23 @@ const ReceivingList = () => {
         onClose={handleCloseModal}
         productId={selectedProductId} // Kirim id produk ke modal
       />
+      {/* Drawer Kanan */}
+      <RightDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        selectedProducts={selectedProducts}
+      />
+
+      {isMobile && (
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => setDrawerOpen(true)}
+          sx={{ position: "fixed", right: 20, bottom: 20 }}
+        >
+          Lihat Produk Dipilih
+        </Button>
+      )}
     </Box>
   );
 };

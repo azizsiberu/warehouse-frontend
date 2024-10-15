@@ -67,38 +67,48 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   // Fetch semua data saat modal dibuka
   useEffect(() => {
     if (open) {
-      if (productId) {
+      if (productId && !productDetails) {
+        // Hanya fetch jika productDetails belum ada
         dispatch(fetchProductById(productId));
       }
-      dispatch(fetchKainAttributes());
-      dispatch(fetchKakiAttributes());
-      dispatch(fetchDudukanAttributes());
-      dispatch(fetchFinishingAttributes());
+
+      // Fetch attributes if not yet fetched
+      if (!kainAttributes.length) dispatch(fetchKainAttributes());
+      if (!kakiAttributes.length) dispatch(fetchKakiAttributes());
+      if (!dudukanAttributes.length) dispatch(fetchDudukanAttributes());
+      if (!finishingOptions.length) dispatch(fetchFinishingAttributes());
     }
-  }, [dispatch, open, productId]);
+  }, [
+    dispatch,
+    open,
+    productId,
+    productDetails,
+    kainAttributes,
+    kakiAttributes,
+    dudukanAttributes,
+    finishingOptions,
+  ]);
 
   // Fetch warna berdasarkan kainId dari produk atau custom
   useEffect(() => {
     let kainId = null;
 
-    // Ambil kainId dari productDetails
-    if (productDetails && productDetails.id_kain) {
+    if (productDetails?.id_kain) {
       kainId = productDetails.id_kain;
     }
 
-    // Ambil kainId dari custom produk jika ada
     const selectedCustomKain = additionalOptions.find(
       (option) => option.jenis === "Kain"
     );
-    if (selectedCustomKain && selectedCustomKain.nilai) {
+    if (selectedCustomKain?.nilai) {
       kainId = selectedCustomKain.nilai;
     }
 
-    // Fetch warna jika kainId ditemukan
-    if (kainId) {
+    // Cek apakah kainId sudah ada sebelum fetch
+    if (kainId && (!warnaOptions || warnaOptions.length === 0)) {
       dispatch(fetchWarnaByKainId(kainId));
     }
-  }, [dispatch, productDetails, additionalOptions]);
+  }, [dispatch, productDetails, additionalOptions, warnaOptions]);
 
   const handleIncrement = useCallback(() => {
     setQuantity((prevQuantity) => prevQuantity + 1);
@@ -161,8 +171,8 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   );
 
   // Fungsi untuk mendapatkan opsi berdasarkan jenis yang dipilih
-  const getOptionsForJenis = useMemo(
-    () => (jenis) => {
+  const getOptionsForJenis = useCallback(
+    (jenis) => {
       switch (jenis) {
         case "Kain":
           return kainAttributes.map((attr) => ({
@@ -187,10 +197,8 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   );
 
   const optionsList = useMemo(() => {
-    return additionalOptions.map((option) => {
-      return getOptionsForJenis(option.jenis);
-    });
-  }, [additionalOptions]);
+    return additionalOptions.map((option) => getOptionsForJenis(option.jenis));
+  }, [additionalOptions, getOptionsForJenis]);
 
   if (loading) {
     return <Loading />; // Tampilkan animasi loading saat data sedang diambil
