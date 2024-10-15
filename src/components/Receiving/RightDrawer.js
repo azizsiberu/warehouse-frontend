@@ -23,14 +23,21 @@ const RightDrawer = ({ open, onClose, selectedProducts }) => {
       open={open || !isMobile} // Selalu buka jika bukan mobile
       onClose={isMobile ? onClose : undefined} // Hanya bisa ditutup di mobile
       variant={isMobile ? "temporary" : "persistent"} // persistent untuk desktop
+      PaperProps={{
+        sx: {
+          maxHeight: "100vh", // Jangan melebihi tinggi viewport
+          overflow: "auto", // Agar konten bisa di-scroll jika melebihi tinggi
+          top: isMobile ? 0 : "64px", // Atur posisi Drawer agar tidak menutupi header di desktop
+        },
+      }}
     >
       <Box
         sx={{
+          height: "100%",
           width: 300,
           padding: 2,
           display: "flex",
           flexDirection: "column",
-          height: "100%",
         }}
       >
         {/* Header Drawer */}

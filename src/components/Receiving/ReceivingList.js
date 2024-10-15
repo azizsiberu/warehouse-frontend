@@ -11,13 +11,19 @@ import {
   Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { MdSearch, MdMenu, MdOutlineAddAPhoto } from "react-icons/md";
+import {
+  MdSearch,
+  MdMenu,
+  MdOutlineAddAPhoto,
+  MdShoppingCart,
+} from "react-icons/md";
 import ProductCard from "../ProductCard";
 import { getProducts } from "../../services/api";
 import useMediaQuery from "@mui/material/useMediaQuery"; // Untuk menentukan apakah di mobile atau tidak
 import Loading from "../Loading";
 import StockEntryModal from "./StockEntryModal"; // Impor modal
 import RightDrawer from "./RightDrawer";
+import RightSidebar from "./RightSidebar";
 import { useNavigate } from "react-router-dom"; // Untuk navigasi
 
 const ReceivingList = () => {
@@ -38,6 +44,7 @@ const ReceivingList = () => {
   const [selectedProductId, setSelectedProductId] = useState(null); // Menyimpan ID produk yang dipilih
 
   const [selectedProducts, setSelectedProducts] = useState([]); // Daftar produk yang dipilih
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Kontrol RightSidebar di mobile
 
   useEffect(() => {
     // Mendapatkan daftar produk dari API
@@ -108,7 +115,14 @@ const ReceivingList = () => {
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100%", // Atur tinggi agar menyesuaikan parent
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {" "}
       {isMobile ? (
         // Tampilan untuk Mobile
         <Box
@@ -191,10 +205,6 @@ const ReceivingList = () => {
           sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
         >
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Typography variant="h4" sx={{ marginRight: 2 }}>
-              Daftar Produk
-            </Typography>
-
             <TextField
               label="Tulis Nama Produk"
               size="small"
@@ -214,7 +224,6 @@ const ReceivingList = () => {
           </Box>
         </Box>
       )}
-
       {!isMobile && (
         <Box display="flex" gap={1} mb={2} flexWrap="wrap">
           {categories.length > 0 ? (
@@ -243,47 +252,62 @@ const ReceivingList = () => {
           )}
         </Box>
       )}
-
-      <Box mt={2}>
-        {filteredProducts.length > 0 ? (
-          <Grid container spacing={2}>
-            {filteredProducts.map((product, index) => (
-              <Grid size={{ xs: 6, md: 4, lg: 2 }} key={index}>
-                <ProductCard
-                  product={product}
-                  buttonLabel="Tambah Stok"
-                  onClick={() => handleAddStock(product.id_produk)}
-                />
-              </Grid>
-            ))}
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh", // Pastikan konten menutupi seluruh tinggi layar
+        }}
+      >
+        <Grid container sx={{ flexGrow: 1 }}>
+          {" "}
+          {/* FlexGrow agar Grid menutupi seluruh tinggi */}
+          <Grid size={{ xs: 12, md: 9, lg: 10 }}>
+            <Box mt={2}>
+              {filteredProducts.length > 0 ? (
+                <Grid container spacing={2}>
+                  {filteredProducts.map((product, index) => (
+                    <Grid size={{ xs: 6, md: 4, lg: 2 }} key={index}>
+                      <ProductCard
+                        product={product}
+                        buttonLabel="Tambah Stok"
+                        onClick={() => handleAddStock(product.id_produk)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Typography variant="body1">
+                  Tidak ada produk dalam kategori ini.
+                </Typography>
+              )}
+            </Box>
+            {/* Modal untuk menambah stok */}
+            <StockEntryModal
+              open={isModalOpen}
+              onClose={handleCloseModal}
+              productId={selectedProductId} // Kirim id produk ke modal
+            />
+            {/* Drawer Kanan */}
           </Grid>
-        ) : (
-          <Typography variant="body1">
-            Tidak ada produk dalam kategori ini.
-          </Typography>
-        )}
+          <Grid size={{ xs: 12, md: 3, lg: 2 }}>
+            <RightSidebar
+              open={sidebarOpen} // Kendalikan dengan state `sidebarOpen`
+              onClose={() => setSidebarOpen(false)} // Tutup saat Drawer ditutup
+              selectedProducts={selectedProducts} // Produk yang dipilih
+            />
+          </Grid>
+        </Grid>
       </Box>
-      {/* Modal untuk menambah stok */}
-      <StockEntryModal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        productId={selectedProductId} // Kirim id produk ke modal
-      />
-      {/* Drawer Kanan */}
-      <RightDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        selectedProducts={selectedProducts}
-      />
-
       {isMobile && (
         <Button
           variant="outlined"
           color="primary"
-          onClick={() => setDrawerOpen(true)}
+          onClick={() => setSidebarOpen(true)} // Buka RightSidebar saat tombol diklik
           sx={{ position: "fixed", right: 20, bottom: 20 }}
         >
-          Lihat Produk Dipilih
+          <MdShoppingCart size={24} />
         </Button>
       )}
     </Box>
