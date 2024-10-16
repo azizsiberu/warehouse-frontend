@@ -64,11 +64,11 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
     (state) => state.products
   );
 
-  // Fetch semua data saat modal dibuka
+  // Fetch all data when the modal is opened
   useEffect(() => {
     if (open) {
-      if (productId && !productDetails) {
-        // Hanya fetch jika productDetails belum ada
+      if (productId) {
+        // Always fetch product details when modal opens
         dispatch(fetchProductById(productId));
       }
 
@@ -82,7 +82,6 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
     dispatch,
     open,
     productId,
-    productDetails,
     kainAttributes,
     kakiAttributes,
     dudukanAttributes,
