@@ -49,6 +49,9 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   const [selectedDudukan, setSelectedDudukan] = useState(null);
 
   const [selectedWarna, setSelectedWarna] = useState("");
+  const [selectedFinishing, setSelectedFinishing] = useState(null); // State untuk pilihan finishing
+
+  const [prevKainId, setPrevKainId] = useState(null);
 
   // Ambil data dari Redux Store
   const kainAttributes = useSelector((state) => state.products.kainAttributes);
@@ -103,11 +106,15 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
       kainId = selectedCustomKain.nilai;
     }
 
-    // Cek apakah kainId sudah ada sebelum fetch
-    if (kainId && (!warnaOptions || warnaOptions.length === 0)) {
+    // Hanya fetch jika kainId berubah
+    if (kainId && kainId !== prevKainId) {
       dispatch(fetchWarnaByKainId(kainId));
+      setPrevKainId(kainId);
+
+      // Reset selectedWarna hanya jika tidak valid dengan warnaOptions baru
+      setSelectedWarna("");
     }
-  }, [dispatch, productDetails, additionalOptions, warnaOptions]);
+  }, [dispatch, productDetails?.id_kain, additionalOptions, prevKainId]);
 
   const handleIncrement = useCallback(() => {
     setQuantity((prevQuantity) => prevQuantity + 1);
@@ -119,17 +126,47 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
     }
   }, [quantity]);
 
-  const handleStockSubmit = useCallback(() => {
-    const stockValue = parseInt(newStock, 10);
-
-    if (isNaN(stockValue) || stockValue <= 0) {
-      setErrorMessage("Masukkan jumlah stok yang valid (harus lebih dari 0).");
+  const handleStockSubmit = () => {
+    if (!productDetails?.id_produk) {
+      console.error("Product ID is missing");
       return;
     }
 
-    onSubmit(stockValue);
+    // Kumpulkan data yang diisi user
+    const productData = {
+      id: productDetails.id_produk, // ID Produk dari productDetails (pastikan sudah ada)
+      nama: productDetails.nama,
+      foto_produk: productDetails.foto_produk,
+      warna: selectedWarna,
+      finishing: selectedFinishing, // Simpan id_finishing, bukan nama
+      jumlah: quantity,
+      customOptions: additionalOptions.filter((option) => option.nilai), // Hanya custom yang ada nilainya
+    };
+
+    console.log("Product data sebelum submit:", productData); // Debugging
+
+    // Panggil fungsi onSubmit dengan data yang dikumpulkan
+    onSubmit(productData);
+
+    // Reset form setelah submit
+    handleCancel();
+  };
+
+  // Fungsi untuk mereset semua state ketika Cancel ditekan
+  const handleCancel = () => {
+    // Reset state ke nilai awal
+    setNewStock(""); // Reset input stok
+    setQuantity(1); // Reset jumlah ke 1
+    setAdditionalOptions([{ jenis: "", nilai: "" }]); // Reset custom options
+    setSelectedKain(null); // Reset pilihan kain
+    setSelectedKaki(null); // Reset pilihan kaki
+    setSelectedDudukan(null); // Reset pilihan dudukan
+    setSelectedWarna(""); // Reset pilihan warna
+    setValidationErrors({}); // Reset semua error validasi
+
+    // Close modal
     onClose();
-  }, [newStock, onSubmit, onClose]);
+  };
 
   useEffect(() => {
     if (open) {
@@ -199,6 +236,22 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
     return additionalOptions.map((option) => getOptionsForJenis(option.jenis));
   }, [additionalOptions, getOptionsForJenis]);
 
+  // Cek apakah ada custom dengan Skandinavian atau Balok Kayu, jika tidak, cek product detail
+  const shouldShowFinishing = useMemo(() => {
+    const customKakiOption = additionalOptions.find(
+      (option) => option.jenis === "Kaki"
+    );
+
+    if (customKakiOption) {
+      const customKaki = kakiAttributes.find(
+        (kaki) => kaki.id_kaki === customKakiOption.nilai
+      );
+      return ["Skandinavian", "Balok Kayu"].includes(customKaki?.jenis_kaki);
+    } else {
+      return ["Skandinavian", "Balok Kayu"].includes(productDetails?.kaki);
+    }
+  }, [additionalOptions, productDetails, kakiAttributes]);
+
   if (loading) {
     return <Loading />; // Tampilkan animasi loading saat data sedang diambil
   }
@@ -224,7 +277,7 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
           overflowY: "auto",
         }}
       >
-        <Typography id="modal-title" variant="h6" component="h2" mb={2}>
+        <Typography id="modal-title" variant="h4" component="h2" mb={2}>
           Penerimaan Barang
         </Typography>
         <Divider />
@@ -589,22 +642,15 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
             </Grid>
           )}
 
-          {/* Pilihan Finishing */}
-          {(productDetails?.id_jenis === 2 ||
-            productDetails?.kaki === "Skandinavian" ||
-            productDetails?.kaki === "Balok Kayu" ||
-            additionalOptions.some(
-              (option) =>
-                option.jenis === "Kaki" &&
-                ["Skandinavian", "Balok Kayu"].includes(
-                  kakiAttributes.find((kaki) => kaki.id_kaki === option.nilai)
-                    ?.jenis_kaki
-                )
-            )) && (
+          {shouldShowFinishing && (
             <Grid item size={6}>
               <FormControl fullWidth size="small">
                 <InputLabel>Finishing</InputLabel>
-                <Select label="Finishing">
+                <Select
+                  label="Finishing"
+                  value={selectedFinishing || ""}
+                  onChange={(event) => setSelectedFinishing(event.target.value)}
+                >
                   {finishingOptions.length > 0 ? (
                     finishingOptions.map((finishing) => (
                       <MenuItem
@@ -625,7 +671,7 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
 
         {/* Tombol Submit dan Cancel */}
         <Box mt={3} display="flex" justifyContent="space-between">
-          <Button variant="outlined" color="secondary" onClick={onClose}>
+          <Button variant="outlined" color="secondary" onClick={handleCancel}>
             Cancel
           </Button>
           <Button

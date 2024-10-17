@@ -22,7 +22,6 @@ import { getProducts } from "../../services/api";
 import useMediaQuery from "@mui/material/useMediaQuery"; // Untuk menentukan apakah di mobile atau tidak
 import Loading from "../Loading";
 import StockEntryModal from "./StockEntryModal"; // Impor modal
-import RightDrawer from "./RightDrawer";
 import RightSidebar from "./RightSidebar";
 import { useNavigate } from "react-router-dom"; // Untuk navigasi
 
@@ -108,6 +107,11 @@ const ReceivingList = () => {
     navigate(`/product/${product.id_produk}/${productNameSlug}`, {
       state: { id_product: product.id_produk },
     });
+  };
+
+  const handleSubmitProduct = (productData) => {
+    // Tambahkan produk yang dipilih ke state
+    setSelectedProducts((prevProducts) => [...prevProducts, productData]);
   };
 
   if (loading) {
@@ -288,7 +292,9 @@ const ReceivingList = () => {
               open={isModalOpen}
               onClose={handleCloseModal}
               productId={selectedProductId} // Kirim id produk ke modal
+              onSubmit={handleSubmitProduct} // Tambahkan onSubmit ke modal
             />
+
             {/* Drawer Kanan */}
           </Grid>
           <Grid size={{ xs: 12, md: 3, lg: 2 }}>

@@ -22,9 +22,13 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
       {!isMobile && (
         <Box
           sx={{
-            width: 300,
+            maxWidth: 300,
+            height: "75vh", // Set fixed height
             maxHeight: "100vh",
-            overflowY: "auto",
+            position: "sticky", // Sticky position
+            top: 0, // Sticky di bagian atas viewport
+
+            overflowY: "hidden",
             display: "flex",
             flexDirection: "column",
             borderLeft: "1px solid #ccc", // Border pemisah
@@ -35,15 +39,65 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
             Produk Dipilih
           </Typography>
           <Divider sx={{ my: 2 }} />
-          <List sx={{ flexGrow: 1 }}>
+          <List sx={{ flexGrow: 1, overflowY: "auto" }}>
             {selectedProducts.length > 0 ? (
               selectedProducts.map((product, index) => (
-                <ListItem key={index}>
-                  <ListItemText
-                    primary={product.nama}
-                    secondary={`Jumlah: ${product.jumlah}`}
-                  />
-                </ListItem>
+                <React.Fragment key={index}>
+                  <ListItem sx={{ alignItems: "flex-start" }}>
+                    {/* Gambar Produk */}
+                    <Box
+                      component="img"
+                      src={product.foto_produk} // pastikan "gambar" ada di product
+                      alt={product.nama}
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        objectFit: "cover",
+                        mr: 2,
+                        borderRadius: 2,
+                      }}
+                    />
+
+                    {/* Detail Produk */}
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="body1" fontWeight="bold">
+                        {product.nama}
+                      </Typography>
+                      <Typography variant="body2">
+                        Jumlah: {product.jumlah}
+                      </Typography>
+
+                      {/* Status Custom */}
+                      <Typography variant="body2" color="text.secondary">
+                        Custom:{" "}
+                        {product.customOptions.length > 0 ? "Ya" : "Tidak"}
+                      </Typography>
+
+                      {/* Tampilkan custom options jika ada */}
+                      {product.customOptions.length > 0 && (
+                        <Box sx={{ ml: 1 }}>
+                          {/* Warna */}
+                          {product.warna && (
+                            <Typography variant="body2">
+                              Warna: {product.warna}
+                            </Typography>
+                          )}
+                          {/* Finishing */}
+                          {product.finishing && (
+                            <Typography variant="body2">
+                              Finishing: {product.finishing}
+                            </Typography>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  </ListItem>
+
+                  {/* Tambahkan Divider antara produk kecuali untuk item terakhir */}
+                  {index < selectedProducts.length - 1 && (
+                    <Divider sx={{ my: 1 }} />
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <Typography variant="body1">
@@ -51,8 +105,10 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
               </Typography>
             )}
           </List>
+
           <Divider sx={{ my: 2 }} />
-          <Box>
+          <Box sx={{ mt: "auto" }}>
+            {" "}
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               Total Produk: {selectedProducts.length}
             </Typography>
