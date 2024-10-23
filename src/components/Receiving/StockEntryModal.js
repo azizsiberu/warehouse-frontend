@@ -15,6 +15,9 @@ import {
   FormControl,
   InputLabel,
   FormHelperText,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useDispatch, useSelector } from "react-redux"; // Jika menggunakan Redux
@@ -47,11 +50,12 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   const [selectedKain, setSelectedKain] = useState(null); // Pilihan kain untuk fetch warna nanti
   const [selectedKaki, setSelectedKaki] = useState(null);
   const [selectedDudukan, setSelectedDudukan] = useState(null);
-
   const [selectedWarna, setSelectedWarna] = useState("");
   const [selectedFinishing, setSelectedFinishing] = useState(null); // State untuk pilihan finishing
 
   const [prevKainId, setPrevKainId] = useState(null);
+
+  const [barangStatus, setBarangStatus] = useState(""); // State untuk barang mentah atau barang jadi
 
   // Ambil data dari Redux Store
   const kainAttributes = useSelector((state) => state.products.kainAttributes);
@@ -67,29 +71,23 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
     (state) => state.products
   );
 
-  // Fetch all data when the modal is opened
+  // Fetch product details when modal opens or productId changes
+  useEffect(() => {
+    if (open && productId) {
+      dispatch(fetchProductById(productId));
+    }
+  }, [dispatch, open, productId]);
+
+  // Fetch attributes only once when the component mounts
   useEffect(() => {
     if (open) {
-      if (productId) {
-        // Always fetch product details when modal opens
-        dispatch(fetchProductById(productId));
-      }
-
-      // Fetch attributes if not yet fetched
       if (!kainAttributes.length) dispatch(fetchKainAttributes());
       if (!kakiAttributes.length) dispatch(fetchKakiAttributes());
       if (!dudukanAttributes.length) dispatch(fetchDudukanAttributes());
       if (!finishingOptions.length) dispatch(fetchFinishingAttributes());
     }
-  }, [
-    dispatch,
-    open,
-    productId,
-    kainAttributes,
-    kakiAttributes,
-    dudukanAttributes,
-    finishingOptions,
-  ]);
+    // Note: No need to include kainAttributes, kakiAttributes, etc., in the dependency array
+  }, [dispatch, open]);
 
   // Fetch warna berdasarkan kainId dari produk atau custom
   useEffect(() => {
@@ -132,15 +130,27 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
       return;
     }
 
+    // Ambil nama warna dan nama finishing berdasarkan ID yang dipilih
+    const selectedWarnaObj = warnaOptions.find(
+      (warna) => warna.id_warna === selectedWarna
+    );
+
+    const selectedFinishingObj = finishingOptions.find(
+      (finishing) => finishing.id_finishing === selectedFinishing
+    );
+
     // Kumpulkan data yang diisi user
     const productData = {
-      id: productDetails.id_produk, // ID Produk dari productDetails (pastikan sudah ada)
+      id: productDetails.id_produk, // ID Produk dari productDetails
       nama: productDetails.nama,
       foto_produk: productDetails.foto_produk,
-      warna: selectedWarna,
-      finishing: selectedFinishing, // Simpan id_finishing, bukan nama
+      id_warna: selectedWarnaObj?.id_warna || null, // ID warna yang dipilih
+      warna: selectedWarnaObj?.warna || "", // Nama warna yang dipilih
+      id_finishing: selectedFinishingObj?.id_finishing || null, // ID finishing yang dipilih
+      finishing: selectedFinishingObj?.finishing || "", // Nama finishing yang dipilih
       jumlah: quantity,
       customOptions: additionalOptions.filter((option) => option.nilai), // Hanya custom yang ada nilainya
+      status: barangStatus,
     };
 
     console.log("Product data sebelum submit:", productData); // Debugging
@@ -163,6 +173,8 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
     setSelectedDudukan(null); // Reset pilihan dudukan
     setSelectedWarna(""); // Reset pilihan warna
     setValidationErrors({}); // Reset semua error validasi
+    setBarangStatus(""); // Reset status barang
+    setSelectedFinishing(null); // Reset pilihan finishing
 
     // Close modal
     onClose();
@@ -238,6 +250,12 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
 
   // Cek apakah ada custom dengan Skandinavian atau Balok Kayu, jika tidak, cek product detail
   const shouldShowFinishing = useMemo(() => {
+    // Jika barangStatus adalah "jadi" dan id_jenis adalah 2
+    if (barangStatus === "jadi" && productDetails?.id_jenis === 2) {
+      return true;
+    }
+
+    // Jika kaki yang dipilih adalah "Skandinavian" atau "Balok Kayu"
     const customKakiOption = additionalOptions.find(
       (option) => option.jenis === "Kaki"
     );
@@ -247,10 +265,11 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
         (kaki) => kaki.id_kaki === customKakiOption.nilai
       );
       return ["Skandinavian", "Balok Kayu"].includes(customKaki?.jenis_kaki);
-    } else {
-      return ["Skandinavian", "Balok Kayu"].includes(productDetails?.kaki);
     }
-  }, [additionalOptions, productDetails, kakiAttributes]);
+
+    // Jika kaki default produk adalah "Skandinavian" atau "Balok Kayu"
+    return ["Skandinavian", "Balok Kayu"].includes(productDetails?.kaki);
+  }, [barangStatus, productDetails, additionalOptions, kakiAttributes]);
 
   if (loading) {
     return <Loading />; // Tampilkan animasi loading saat data sedang diambil
@@ -617,6 +636,31 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
           </Grid>
         </Box>
 
+        {/* Opsi Barang Mentah dan Barang Jadi, hanya jika id_jenis === 2 */}
+        {productDetails?.id_jenis === 2 && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">Pilih Status Barang:</Typography>
+            <FormControl component="fieldset">
+              <RadioGroup
+                row
+                value={barangStatus}
+                onChange={(event) => setBarangStatus(event.target.value)}
+              >
+                <FormControlLabel
+                  value="mentah"
+                  control={<Radio />}
+                  label="Barang Mentah"
+                />
+                <FormControlLabel
+                  value="jadi"
+                  control={<Radio />}
+                  label="Barang Jadi"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Box>
+        )}
+
         <Grid container spacing={2} sx={{ mt: 2 }}>
           {/* Pilihan Warna */}
           {productDetails?.id_kain && (
@@ -687,4 +731,4 @@ const StockEntryModal = ({ open, onClose, productId, onSubmit }) => {
   );
 };
 
-export default React.memo(StockEntryModal);
+export default StockEntryModal;

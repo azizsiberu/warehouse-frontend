@@ -119,78 +119,133 @@ const ReceivingList = () => {
   }
 
   return (
-    <Box
-      sx={{
-        height: "100%", // Atur tinggi agar menyesuaikan parent
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {" "}
-      {isMobile ? (
-        // Tampilan untuk Mobile
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={2}
-          sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
-        >
-          <IconButton onClick={() => setDrawerOpen(true)}>
-            <MdMenu />
-          </IconButton>
+    <Box sx={{ display: "flex", flexDirection: "row", height: "100%" }}>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 8, lg: 9 }}>
+          {" "}
+          {isMobile ? (
+            // Tampilan untuk Mobile
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={2}
+              sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
+            >
+              <IconButton onClick={() => setDrawerOpen(true)}>
+                <MdMenu />
+              </IconButton>
 
-          <TextField
-            placeholder="Cari Produk"
-            size="small"
-            variant="outlined"
-            value={searchTerm}
-            onChange={handleSearch}
-            sx={{ flexGrow: 1, marginRight: 2 }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <MdSearch />
-                </InputAdornment>
-              ),
-            }}
-          />
+              <TextField
+                placeholder="Cari Produk"
+                size="small"
+                variant="outlined"
+                value={searchTerm}
+                onChange={handleSearch}
+                sx={{ flexGrow: 1, marginRight: 2 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <MdSearch />
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-          <Drawer
-            anchor="left"
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            sx={{ boxShadow: 2 }}
-          >
-            <Box p={2} width={250} role="presentation">
-              <Typography variant="h6" gutterBottom>
-                Kategori
-              </Typography>
-              <Divider sx={{ my: 2 }} />
+              <Drawer
+                anchor="left"
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                sx={{ boxShadow: 2 }}
+              >
+                <Box p={2} width={250} role="presentation">
+                  <Typography variant="h6" gutterBottom>
+                    Kategori
+                  </Typography>
+                  <Divider sx={{ my: 2 }} />
 
+                  {categories.length > 0 ? (
+                    categories.map((category, index) => (
+                      <Typography
+                        key={index}
+                        onClick={() => handleFilter(category)}
+                        variant="body1"
+                        sx={{
+                          mb: 1,
+                          cursor: "pointer",
+                          textTransform: "none",
+                          fontWeight:
+                            selectedCategory === category ? "bold" : "normal",
+                          color:
+                            selectedCategory === category
+                              ? "primary.main"
+                              : "text.primary",
+                          "&:hover": {
+                            textDecoration: "underline",
+                          },
+                        }}
+                      >
+                        {category}
+                      </Typography>
+                    ))
+                  ) : (
+                    <Typography variant="body1">
+                      Tidak ada kategori tersedia.
+                    </Typography>
+                  )}
+                </Box>
+              </Drawer>
+            </Box>
+          ) : (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={2}
+              sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+                <TextField
+                  label="Cari Produk"
+                  size="small"
+                  variant="outlined"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  fullWidth
+                  sx={{ mr: 3 }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <MdSearch />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+          {!isMobile && (
+            <Box display="flex" gap={1} mb={2} flexWrap="wrap">
               {categories.length > 0 ? (
                 categories.map((category, index) => (
-                  <Typography
+                  <Button
                     key={index}
+                    variant={
+                      selectedCategory === category ? "contained" : "outlined"
+                    }
+                    color={
+                      selectedCategory === category ? "primary" : "default"
+                    }
                     onClick={() => handleFilter(category)}
-                    variant="body1"
                     sx={{
-                      mb: 1,
-                      cursor: "pointer",
                       textTransform: "none",
-                      fontWeight:
-                        selectedCategory === category ? "bold" : "normal",
-                      color:
-                        selectedCategory === category
-                          ? "primary.main"
-                          : "text.primary",
-                      "&:hover": {
-                        textDecoration: "underline",
-                      },
+                      fontWeight: "bold",
+                      minWidth: "80px",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {category}
-                  </Typography>
+                  </Button>
                 ))
               ) : (
                 <Typography variant="body1">
@@ -198,114 +253,43 @@ const ReceivingList = () => {
                 </Typography>
               )}
             </Box>
-          </Drawer>
-        </Box>
-      ) : (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={2}
-          sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <TextField
-              label="Tulis Nama Produk"
-              size="small"
-              variant="outlined"
-              value={searchTerm}
-              onChange={handleSearch}
-              fullWidth
-              sx={{ maxWidth: "600px", mr: 3 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <MdSearch />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-        </Box>
-      )}
-      {!isMobile && (
-        <Box display="flex" gap={1} mb={2} flexWrap="wrap">
-          {categories.length > 0 ? (
-            categories.map((category, index) => (
-              <Button
-                key={index}
-                variant={
-                  selectedCategory === category ? "contained" : "outlined"
-                }
-                color={selectedCategory === category ? "primary" : "default"}
-                onClick={() => handleFilter(category)}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  minWidth: "80px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {category}
-              </Button>
-            ))
-          ) : (
-            <Typography variant="body1">
-              Tidak ada kategori tersedia.
-            </Typography>
           )}
-        </Box>
-      )}
-      <Box
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh", // Pastikan konten menutupi seluruh tinggi layar
-        }}
-      >
-        <Grid container sx={{ flexGrow: 1 }}>
-          {" "}
-          {/* FlexGrow agar Grid menutupi seluruh tinggi */}
-          <Grid size={{ xs: 12, md: 9, lg: 10 }}>
-            <Box mt={2}>
-              {filteredProducts.length > 0 ? (
-                <Grid container spacing={2}>
-                  {filteredProducts.map((product, index) => (
-                    <Grid size={{ xs: 6, md: 4, lg: 2 }} key={index}>
-                      <ProductCard
-                        product={product}
-                        buttonLabel="Tambah Stok"
-                        onClick={() => handleAddStock(product.id_produk)}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-              ) : (
-                <Typography variant="body1">
-                  Tidak ada produk dalam kategori ini.
-                </Typography>
-              )}
-            </Box>
-            {/* Modal untuk menambah stok */}
-            <StockEntryModal
-              open={isModalOpen}
-              onClose={handleCloseModal}
-              productId={selectedProductId} // Kirim id produk ke modal
-              onSubmit={handleSubmitProduct} // Tambahkan onSubmit ke modal
-            />
-
-            {/* Drawer Kanan */}
-          </Grid>
-          <Grid size={{ xs: 12, md: 3, lg: 2 }}>
-            <RightSidebar
-              open={sidebarOpen} // Kendalikan dengan state `sidebarOpen`
-              onClose={() => setSidebarOpen(false)} // Tutup saat Drawer ditutup
-              selectedProducts={selectedProducts} // Produk yang dipilih
-            />
-          </Grid>
+          <Box mt={2}>
+            {filteredProducts.length > 0 ? (
+              <Grid container spacing={2}>
+                {filteredProducts.map((product, index) => (
+                  <Grid size={{ xs: 6, md: 3 }} key={index}>
+                    <ProductCard
+                      product={product}
+                      buttonLabel="Tambah Stok"
+                      onClick={() => handleAddStock(product.id_produk)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography variant="body1">
+                Tidak ada produk dalam kategori ini.
+              </Typography>
+            )}
+          </Box>
         </Grid>
-      </Box>
+        <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+          <RightSidebar
+            selectedProducts={selectedProducts}
+            setSelectedProducts={setSelectedProducts}
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+        </Grid>
+      </Grid>
+      {/* Modal untuk menambah stok */}
+      <StockEntryModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        productId={selectedProductId} // Kirim id produk ke modal
+        onSubmit={handleSubmitProduct} // Tambahkan onSubmit ke modal
+      />
       {isMobile && (
         <Button
           variant="outlined"
