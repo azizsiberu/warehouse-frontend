@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Box } from "@mui/material";
 import CustomAppBar from "../components/AppBar";
+import ProtectedRoute from "./ProtectedRoute";
 import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import VerifyCode from "../components/auth/VerifyCode";
@@ -30,15 +31,10 @@ const AppRoutes = () => {
 
   return (
     <>
-      {/* Tampilkan AppBar di semua halaman kecuali halaman otentikasi */}
       {!authRoutes.includes(location.pathname) && (
-        <>
-          <CustomAppBar pageTitle={pageTitle} />
-          {/* Menambahkan Toolbar untuk memberikan jarak antara AppBar dan konten */}
-        </>
+        <CustomAppBar pageTitle={pageTitle} />
       )}
 
-      {/* Konten halaman */}
       <Box sx={{ padding: 2 }}>
         <Routes>
           <Route
@@ -57,27 +53,31 @@ const AppRoutes = () => {
             path="/reset-password"
             element={<ResetPassword setPageTitle={updateDocumentTitle} />}
           />
-          <Route
-            path="/"
-            element={<DashboardView setPageTitle={updateDocumentTitle} />}
-          />
-          <Route
-            path="/product-management"
-            element={
-              <ProductManagementView setPageTitle={updateDocumentTitle} />
-            }
-          />
-          <Route
-            path="/product/:id/:slug"
-            element={<ProductDetails setPageTitle={updateDocumentTitle} />}
-          />
-          <Route
-            path="/receiving"
-            element={
-              <ReceivingManagementView setPageTitle={updateDocumentTitle} />
-            }
-          />
-          {/* Tambahkan rute lainnya di sini */}
+
+          {/* Bungkus rute yang dilindungi dengan ProtectedRoute */}
+          <Route element={<ProtectedRoute />}>
+            <Route
+              path="/"
+              element={<DashboardView setPageTitle={updateDocumentTitle} />}
+            />
+            <Route
+              path="/product-management"
+              element={
+                <ProductManagementView setPageTitle={updateDocumentTitle} />
+              }
+            />
+            <Route
+              path="/product/:id/:slug"
+              element={<ProductDetails setPageTitle={updateDocumentTitle} />}
+            />
+            <Route
+              path="/receiving"
+              element={
+                <ReceivingManagementView setPageTitle={updateDocumentTitle} />
+              }
+            />
+            {/* Tambahkan rute lainnya yang dilindungi di sini */}
+          </Route>
         </Routes>
       </Box>
     </>

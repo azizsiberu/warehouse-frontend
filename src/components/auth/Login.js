@@ -8,20 +8,30 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../redux/reducers/authReducer";
 import LogoWebp from "../../assets/logo/logo-ajeg-hijau-64.webp";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import ForgotPasswordDialog from "./ForgotPasswordDialog";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
-  const handleLogin = () => {
-    // Tambahkan logika untuk menangani login
-    console.log("Logging in with", email, password);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.auth); // Mengambil state loading dan error dari Redux
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    dispatch(login({ identifier, password })).then((result) => {
+      if (!result.error) {
+        navigate("/");
+      }
+    });
   };
 
   const handleForgotPasswordOpen = () => {
@@ -35,10 +45,10 @@ const Login = () => {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100hv",
         display: "flex",
         justifyContent: "center",
-        padding: 2,
+        padding: "auto",
       }}
     >
       <Box
@@ -82,48 +92,55 @@ const Login = () => {
           Login
         </Typography>
 
-        <TextField
-          label="Email"
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          variant="outlined"
-          margin="normal"
-          type={showPassword ? "text" : "password"}
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
-                  {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <Typography variant="body1" textAlign={"right"}>
-          <Link onClick={handleForgotPasswordOpen}>Lupa Sandi?</Link>
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleLogin}
-          fullWidth
-          sx={{ mt: 2, mb: 2 }}
-        >
-          Login
-        </Button>
+        <form onSubmit={handleLogin}>
+          <TextField
+            label="Email atau Username"
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+          />
+          <TextField
+            label="Password"
+            variant="outlined"
+            margin="normal"
+            type={showPassword ? "text" : "password"}
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Typography variant="body1" textAlign={"right"}>
+            <Link onClick={handleForgotPasswordOpen}>Lupa Sandi?</Link>
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            fullWidth
+            sx={{ mt: 2, mb: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Login"}
+          </Button>
+          {error && (
+            <Typography color="error" variant="body2" align="center">
+              {error}
+            </Typography>
+          )}
+        </form>
         <Typography variant="body1">
           Belum punya akun? <Link to="/register">Daftar disini</Link>
         </Typography>

@@ -15,11 +15,19 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HomeIcon from "@mui/icons-material/Home";
 import { MdCircleNotifications } from "react-icons/md";
+import { useSelector, useDispatch } from "react-redux";
+import { clearAuth } from "../redux/reducers/authReducer";
+import DefaultLogo from "../assets/logo/logo-ajeg-hijau-64.webp";
 
 const CustomAppBar = ({ pageTitle }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const theme = useTheme(); // Mengakses tema dengan useTheme
+  const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { nama_lengkap, foto_profil } = useSelector(
+    (state) => state.auth.profile
+  );
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -29,89 +37,122 @@ const CustomAppBar = ({ pageTitle }) => {
     setAnchorEl(null);
   };
 
-  // Handle navigation
   const handleBackHome = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
 
   const handleGoHome = () => {
-    navigate("/"); // Navigate to the home page
+    navigate("/");
+  };
+
+  const handleLogout = () => {
+    dispatch(clearAuth());
+    navigate("/login");
   };
 
   return (
-    <AppBar
-      position="sticky"
+    <Box
       sx={{
-        zIndex: 1000,
-        bgcolor: "background.paper",
-        color: theme.palette.primary.main,
-        boxShadow: 0,
-        borderBottom: `1px solid ${theme.palette.divider}`,
+        width: "100%",
+        maxWidth: "100vw", // Agar tidak melebihi layar
       }}
     >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Left Section: Back, Divider, Home, Page Title */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Tombol Home */}
-          <IconButton
-            color="inherit"
-            onClick={handleGoHome}
-            edge="start"
-            sx={{ mx: 1 }}
-          >
-            <HomeIcon />
-          </IconButton>
+      <AppBar
+        position="sticky"
+        sx={{
+          zIndex: 1000,
+          bgcolor: "background.paper",
+          color: theme.palette.primary.main,
+          boxShadow: 0,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            maxWidth: "100%", // Tidak melebihi lebar layar
+            px: 2, // Padding horizontal
+          }}
+        >
+          {/* Left Section: Back, Divider, Home, Page Title */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {/* Tombol Home */}
+            <IconButton color="inherit" onClick={handleGoHome} edge="start">
+              <HomeIcon />
+            </IconButton>
 
-          {/* Divider Vertikal */}
-          <Divider orientation="vertical" flexItem />
+            {/* Divider Vertikal */}
+            <Divider orientation="vertical" flexItem />
 
-          {/* Tombol Back */}
-          <IconButton
-            color="inherit"
-            onClick={handleBackHome}
-            edge="start"
-            sx={{ mx: 1 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
+            {/* Tombol Back */}
+            <IconButton
+              color="inherit"
+              onClick={handleBackHome}
+              edge="start"
+              sx={{ mx: 1 }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
 
-          {/* Judul Halaman */}
-          <Typography variant="h5" sx={{ marginLeft: 2 }}>
-            {pageTitle}
-          </Typography>
-        </Box>
+            {/* Judul Halaman */}
+            <Typography
+              variant="h5"
+              sx={{
+                [theme.breakpoints.down("sm")]: {
+                  fontSize: "1rem", // Ukuran font lebih kecil di layar kecil
+                },
+                fontSize: "1.5rem", // Ukuran font normal
+                ml: 1,
+              }}
+            >
+              {pageTitle}
+            </Typography>
+          </Box>
 
-        {/* Right Section: Avatar and Menu */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton color="inherit" sx={{ mx: 1 }}>
-            <MdCircleNotifications size={24} />
-          </IconButton>
-          <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
-            <Avatar alt="User Profile" src="/static/images/avatar/1.jpg" />{" "}
-            {/* Ganti dengan avatar atau placeholder */}
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-          >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={() => console.log("Logging out")}>
-              Logout
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          {/* Right Section: Avatar and Menu */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton color="inherit" sx={{ mx: 1 }}>
+              <MdCircleNotifications size={24} />
+            </IconButton>
+            <Typography
+              variant="body2"
+              sx={{
+                mx: 1,
+                [theme.breakpoints.down("sm")]: {
+                  display: "none", // Sembunyikan nama user di layar kecil
+                },
+              }}
+            >
+              {nama_lengkap}
+            </Typography>
+            <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
+              <Avatar
+                alt="User Profile"
+                src={foto_profil || DefaultLogo} // Gunakan foto_profil jika ada, jika tidak gunakan DefaultLogo
+              />{" "}
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+              <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 

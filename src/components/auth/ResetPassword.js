@@ -8,7 +8,9 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { resetPasswordThunk } from "../../redux/reducers/authReducer";
 import LogoWebp from "../../assets/logo/logo-ajeg-hijau-64.webp";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
@@ -18,10 +20,31 @@ const ResetPassword = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { loading, error } = useSelector((state) => state.auth);
+
+  // Ambil email dari location.state atau redirect jika tidak tersedia
+  const email = location.state?.email;
+  if (!email) {
+    navigate("/forgot-password");
+  }
+
   const handleResetPassword = () => {
-    // Tambahkan logika untuk memperbarui sandi pengguna
-    console.log("Resetting password to", newPassword);
-    // Anda bisa menambahkan navigasi ke halaman login setelah reset password berhasil
+    // Validasi kecocokan password
+    if (newPassword !== confirmPassword) {
+      alert("Password dan konfirmasi password tidak cocok.");
+      return;
+    }
+
+    // Panggil resetPasswordThunk dengan email dan newPassword
+    dispatch(resetPasswordThunk({ email, newPassword })).then((result) => {
+      if (!result.error) {
+        alert("Password berhasil diperbarui. Silahkan login.");
+        navigate("/login");
+      }
+    });
   };
 
   return (
@@ -118,9 +141,15 @@ const ResetPassword = () => {
           onClick={handleResetPassword}
           fullWidth
           sx={{ mt: 2, mb: 2 }}
+          disabled={loading}
         >
-          Perbarui Sandi
+          {loading ? "Memperbarui..." : "Perbarui Sandi"}
         </Button>
+        {error && (
+          <Typography color="error" variant="body2" align="center">
+            {error}
+          </Typography>
+        )}
         <Typography variant="body1">
           Sudah ingat kata sandi? <Link to="/login">Masuk disini</Link>
         </Typography>

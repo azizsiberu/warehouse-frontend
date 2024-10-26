@@ -2,11 +2,14 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import { useSelector } from "react-redux";
 import menuItems from "./MenuItems"; // Import daftar menu
 import MenuItem from "./MenuItem"; // Import komponen MenuItem
 import logoWebp from "../assets/logo/logo-ajeg-hijau-64.webp";
 
 const MainMenu = () => {
+  const { nama_lengkap } = useSelector((state) => state.auth.profile);
+
   return (
     <Box
       sx={{
@@ -42,7 +45,7 @@ const MainMenu = () => {
         </Box>
 
         <Typography variant="h5" gutterBottom>
-          Halo, Admin, Selamat Datang!
+          Halo, {nama_lengkap || "Admin"}, Selamat Datang!
         </Typography>
         <Typography variant="h5" gutterBottom>
           Silakan pilih menu yang tersedia
