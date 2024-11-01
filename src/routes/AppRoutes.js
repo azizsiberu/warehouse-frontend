@@ -1,7 +1,8 @@
 // path: /src/routes/AppRoutes.js
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { useState } from "react";
-
+import { useDispatch, useSelector } from "react-redux";
 import { Box } from "@mui/material";
 import CustomAppBar from "../components/AppBar";
 import ProtectedRoute from "./ProtectedRoute";
@@ -13,6 +14,7 @@ import DashboardView from "../views/DashboardView";
 import ProductManagementView from "../views/ProductManagementView";
 import ProductDetails from "../components/ProductManagement/ProductDetails";
 import ReceivingManagementView from "../views/ReceivingStock";
+import { clearAuth } from "../redux/reducers/authReducer";
 
 const APP_NAME = "Ajeg Gudang"; // Define your application name here
 
@@ -25,6 +27,20 @@ const AppRoutes = () => {
     setPageTitle(pageTitle); // Update the state for AppBar
     document.title = fullTitle; // Set the document title
   };
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    // Cek token saat komponen AppRoutes dimuat
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      // Jika token tidak ada, lakukan logout dan arahkan ke login
+      dispatch(clearAuth());
+      navigate("/login", { replace: true });
+    }
+  }, [dispatch, navigate]);
 
   // Daftar halaman otentikasi di mana AppBar tidak akan ditampilkan
   const authRoutes = ["/login", "/register", "/verify-code", "/reset-password"];

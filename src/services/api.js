@@ -1,5 +1,9 @@
 // path: /src/services/api.js
 import axios from "axios";
+import store from "../redux/store";
+import { clearAuth } from "../redux/reducers/authReducer";
+
+let isLoggingOut = false;
 
 // Buat instance axios dengan baseURL dari .env
 const api = axios.create({
@@ -16,6 +20,21 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor untuk respon mengarahkan ke login jika token expired
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.log("Error in interceptor:", error.response?.status); // Debug log
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      store.dispatch(clearAuth());
+      localStorage.removeItem("authToken");
+      console.log("Redirecting to /login due to unauthorized access"); // Debug log for redirect
+      window.location.href = "/login";
+    }
     return Promise.reject(error);
   }
 );
@@ -108,6 +127,12 @@ export const getWarnaByKainId = async (id_kain) => {
 export const getFinishingAttributes = async () => {
   const response = await api.get(`/api/attributes/finishing`);
   return response.data; // Kembalikan data dari API
+};
+
+// Fungsi untuk mendapatkan daftar lokasi warehouse
+export const getWarehouses = async () => {
+  const response = await api.get("/api/warehouses");
+  return response.data;
 };
 
 export default api;

@@ -19,11 +19,11 @@ import {
 } from "react-icons/md";
 import ProductCard from "../ProductCard";
 import { getProducts } from "../../services/api";
-import useMediaQuery from "@mui/material/useMediaQuery"; // Untuk menentukan apakah di mobile atau tidak
+import useMediaQuery from "@mui/material/useMediaQuery";
 import Loading from "../Loading";
-import StockEntryModal from "./StockEntryModal"; // Impor modal
 import RightSidebar from "./RightSidebar";
-import { useNavigate } from "react-router-dom"; // Untuk navigasi
+import { useNavigate } from "react-router-dom";
+import NewStockModal from "./NewStockModal";
 
 const ReceivingList = () => {
   const [products, setProducts] = useState([]);
@@ -32,7 +32,7 @@ const ReceivingList = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState(""); // State untuk menyimpan kata pencarian
   const [drawerOpen, setDrawerOpen] = useState(false); // State untuk drawer
-  const isMobile = useMediaQuery("(max-width:600px)"); // Cek jika di mobile
+  const isMobile = useMediaQuery("(max-width:900px)"); // Cek jika di mobile
   const [loading, setLoading] = useState(true); // Tambahkan state untuk loading
   const navigate = useNavigate(); // Untuk navigasi
   const sortProductsByName = (products) => {
@@ -40,7 +40,7 @@ const ReceivingList = () => {
   };
 
   const [isModalOpen, setIsModalOpen] = useState(false); // Untuk mengelola buka/tutup modal
-  const [selectedProductId, setSelectedProductId] = useState(null); // Menyimpan ID produk yang dipilih
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [selectedProducts, setSelectedProducts] = useState([]); // Daftar produk yang dipilih
   const [sidebarOpen, setSidebarOpen] = useState(false); // Kontrol RightSidebar di mobile
@@ -79,14 +79,14 @@ const ReceivingList = () => {
   };
 
   const handleAddStock = (productId) => {
-    console.log("Opening modal for product ID:", productId); // Debugging
-    setSelectedProductId(productId);
-    setIsModalOpen(true);
+    const product = products.find((p) => p.id_produk === productId);
+    setSelectedProduct(product); // Set selected product
+    setIsModalOpen(true); // Open NewStockModal
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false); // Tutup modal
-    setSelectedProductId(null); // Reset produk yang dipilih
+    setIsModalOpen(false);
+    setSelectedProduct(null); // Clear selected product
   };
 
   const handleSearch = (event) => {
@@ -110,8 +110,13 @@ const ReceivingList = () => {
   };
 
   const handleSubmitProduct = (productData) => {
-    // Tambahkan produk yang dipilih ke state
     setSelectedProducts((prevProducts) => [...prevProducts, productData]);
+  };
+
+  const handleDeleteProduct = (productId) => {
+    setSelectedProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id_produk !== productId)
+    );
   };
 
   if (loading) {
@@ -280,16 +285,19 @@ const ReceivingList = () => {
             setSelectedProducts={setSelectedProducts}
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
+            handleDeleteProduct={handleDeleteProduct}
           />
         </Grid>
       </Grid>
-      {/* Modal untuk menambah stok */}
-      <StockEntryModal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        productId={selectedProductId} // Kirim id produk ke modal
-        onSubmit={handleSubmitProduct} // Tambahkan onSubmit ke modal
-      />
+
+      {isModalOpen && (
+        <NewStockModal
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          product={selectedProduct}
+          handleSubmitProduct={handleSubmitProduct}
+        />
+      )}
       {isMobile && (
         <Button
           variant="outlined"

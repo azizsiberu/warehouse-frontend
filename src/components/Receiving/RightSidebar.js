@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Typography,
@@ -9,14 +10,37 @@ import {
   Button,
   Drawer,
   IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { MdClose } from "react-icons/md";
+import { fetchWarehouses } from "../../redux/reducers/warehouseReducer";
 
-const RightSidebar = ({ open, onClose, selectedProducts }) => {
-  const isMobile = useMediaQuery("(max-width:600px)"); // Deteksi apakah mobile
-  const handleDeleteProduct = (productId) => {};
+const RightSidebar = ({
+  selectedProducts,
+  handleDeleteProduct,
+  open,
+  onClose,
+}) => {
+  const isMobile = useMediaQuery("(max-width:900px)");
+  const { locations } = useSelector((state) => state.warehouses); // Mengambil lokasi dari Redux
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const dispatch = useDispatch();
+
+  // Ambil lokasi warehouse saat komponen dimuat
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+    console.log("fetching warehouses: ", locations);
+  }, [dispatch]);
+
+  const totalQuantity = selectedProducts.reduce(
+    (total, productData) => total + productData.jumlah,
+    0
+  );
 
   return (
     <>
@@ -42,7 +66,7 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
           </Box>
           <List sx={{ flexGrow: 1, overflowY: "auto" }}>
             {selectedProducts.length > 0 ? (
-              selectedProducts.map((product, index) => (
+              selectedProducts.map((productData, index) => (
                 <React.Fragment key={index}>
                   <ListItem sx={{ alignItems: "flex-start" }}>
                     {/* Gambar Produk */}
@@ -51,8 +75,8 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
                         <Grid size={3}>
                           <Box
                             component="img"
-                            src={product.foto_produk} // pastikan "gambar" ada di product
-                            alt={product.nama}
+                            src={productData.product?.foto_produk} // pastikan "gambar" ada di product
+                            alt={productData.product?.nama}
                             sx={{
                               width: "100%",
                               height: "100%",
@@ -66,26 +90,29 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
                           {/* Detail Produk */}
                           <Box sx={{ flexGrow: 1 }}>
                             <Typography variant="body2" fontWeight="bold">
-                              {product.nama} x {product.jumlah}
+                              {productData.product?.nama} x {productData.jumlah}
                             </Typography>
 
                             {/* Status Custom */}
                             <Typography variant="body2" color="text.secondary">
                               Custom:{" "}
-                              {product.customOptions.length > 0
+                              {productData.additionalOptions?.length > 0
                                 ? "Ya"
                                 : "Tidak"}
                             </Typography>
                             <Typography variant="body2">
-                              {product.warna && `Warna: ${product.warna}`}
-                              {product.finishing &&
-                                ` | Finishing: ${product.finishing}`}
+                              {productData.warna &&
+                                `Warna: ${productData.warna}`}
+                              {productData.finishing &&
+                                ` | Finishing: ${productData.finishing}`}
                             </Typography>
                           </Box>
                         </Grid>
                         <Grid size={2}>
                           <IconButton
-                            onClick={() => handleDeleteProduct(product.id)}
+                            onClick={() =>
+                              handleDeleteProduct(productData.id_produk)
+                            } // Panggil handleDeleteProduct
                             color="error"
                             aria-label="delete"
                           >
@@ -117,8 +144,29 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
           <Box sx={{ mb: 0 }}>
             {" "}
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Total Produk: {selectedProducts.length}
+              Total Produk: {totalQuantity}
             </Typography>
+            {/* Pilihan Lokasi Warehouse */}
+            <FormControl
+              fullWidth
+              variant="outlined"
+              size="small"
+              sx={{ mb: 2 }}
+            >
+              <InputLabel id="select-location-label">Pilih Lokasi</InputLabel>
+              <Select
+                labelId="select-location-label"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                label="Pilih Lokasi"
+              >
+                {locations.map((location) => (
+                  <MenuItem key={location.id} value={location.id}>
+                    {location.lokasi}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Button variant="contained" color="primary" fullWidth>
               Lanjutkan Proses
             </Button>
@@ -156,11 +204,11 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
 
             <List sx={{ flexGrow: 1 }}>
               {selectedProducts.length > 0 ? (
-                selectedProducts.map((product, index) => (
+                selectedProducts.map((productData, index) => (
                   <ListItem key={index}>
                     <ListItemText
-                      primary={product.nama}
-                      secondary={`Jumlah: ${product.jumlah}`}
+                      primary={productData.product?.nama}
+                      secondary={`Jumlah: ${productData.jumlah}`}
                     />
                   </ListItem>
                 ))
@@ -176,7 +224,7 @@ const RightSidebar = ({ open, onClose, selectedProducts }) => {
 
           <Box sx={{ padding: 2 }}>
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Total Produk: {selectedProducts.length}
+              Total Produk: {totalQuantity}
             </Typography>
             <Button variant="contained" color="primary" fullWidth>
               Lanjutkan Proses
