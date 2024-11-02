@@ -60,7 +60,7 @@ const authSlice = createSlice({
     setProfile: (state, action) => {
       const { profile, userId } = action.payload;
       state.profile = profile;
-      localStorage.setItem("userProfile", JSON.stringify(action.payload));
+      localStorage.setItem("userProfile", JSON.stringify(profile)); // Hanya menyimpan profile
       state.userId = userId;
       localStorage.setItem("userId", userId);
     },

@@ -33,14 +33,16 @@ const AppRoutes = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   useEffect(() => {
-    // Cek token saat komponen AppRoutes dimuat
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      // Jika token tidak ada, lakukan logout dan arahkan ke login
-      dispatch(clearAuth());
+    // Periksa apakah pengguna sudah login atau belum
+    if (
+      !isAuthenticated &&
+      !["/login", "/register", "/verify-code", "/reset-password"].includes(
+        location.pathname
+      )
+    ) {
       navigate("/login", { replace: true });
     }
-  }, [dispatch, navigate]);
+  }, [isAuthenticated, location, navigate]);
 
   // Daftar halaman otentikasi di mana AppBar tidak akan ditampilkan
   const authRoutes = ["/login", "/register", "/verify-code", "/reset-password"];
