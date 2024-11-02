@@ -13,6 +13,7 @@ import {
   Button,
   Radio,
   RadioGroup,
+  FormHelperText,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +29,7 @@ const KayuForm = ({
   onDataChange,
   productId,
   validationErrors = {},
+  setValidationErrors,
 }) => {
   const dispatch = useDispatch();
   const { finishingOptions } = useSelector((state) => state.products);
@@ -54,21 +56,23 @@ const KayuForm = ({
     const updatedOptions = [...additionalOptions];
     updatedOptions[index][field] = value;
 
-    // Periksa apakah ada opsi tambahan yang valid
-    const filteredOptions = updatedOptions.filter(
-      (option) => option.jenis && option.nilai
-    );
-
     setAdditionalOptions(updatedOptions);
 
-    // Kirim array kosong jika filteredOptions kosong
     onDataChange({
       id_produk: productId,
-      additionalOptions: filteredOptions.length > 0 ? filteredOptions : [],
+      additionalOptions: updatedOptions,
       finishing: selectedFinishing,
       id_finishing: selectedFinishingId,
       barangMentah,
     });
+
+    // Validasi hanya `nilai` jika `jenis` dipilih
+    if (updatedOptions[index].jenis && !updatedOptions[index].nilai) {
+      validationErrors[`additionalOptions[${index}].nilai`] =
+        "Nilai harus diisi";
+    } else {
+      delete validationErrors[`additionalOptions[${index}].nilai`];
+    }
   };
 
   const handleBarangMentahChange = (event) => {
@@ -78,24 +82,15 @@ const KayuForm = ({
     if (value === "Ya") {
       setSelectedFinishing("");
       setSelectedFinishingId("");
-      onDataChange({
-        id_produk: productId,
-        additionalOptions: [], // Kosongkan additionalOptions
-        barangMentah: value,
-      });
-    } else {
-      const filteredOptions = additionalOptions.filter(
-        (option) => option.jenis && option.nilai
-      );
-
-      onDataChange({
-        id_produk: productId,
-        additionalOptions: filteredOptions.length > 0 ? filteredOptions : [],
-        finishing: selectedFinishing,
-        id_finishing: selectedFinishingId,
-        barangMentah: value,
-      });
     }
+
+    onDataChange({
+      id_produk: productId,
+      additionalOptions,
+      finishing: value === "Ya" ? "" : selectedFinishing,
+      id_finishing: value === "Ya" ? "" : selectedFinishingId,
+      barangMentah: value,
+    });
   };
 
   const addAdditionalOption = () => {
@@ -111,6 +106,13 @@ const KayuForm = ({
       (option) => option.jenis && option.nilai
     );
 
+    // Bersihkan error dari opsi tambahan yang dihapus
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      delete newErrors[`additionalOptions[${index}].nilai`];
+      return newErrors;
+    });
+
     onDataChange({
       id_produk: productId,
       ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
@@ -122,6 +124,16 @@ const KayuForm = ({
 
   const handleRemoveAll = () => {
     setAdditionalOptions([]);
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      Object.keys(newErrors).forEach((key) => {
+        if (key.startsWith("additionalOptions")) {
+          delete newErrors[key];
+        }
+      });
+      return newErrors;
+    });
+
     onDataChange({
       id_produk: productId,
       additionalOptions: [],
@@ -134,6 +146,19 @@ const KayuForm = ({
   const handleFinishingChange = (value, id) => {
     setSelectedFinishing(value);
     setSelectedFinishingId(id);
+
+    if (barangMentah === "Tidak" && !value) {
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        finishing: "Finishing harus diisi",
+      }));
+    } else {
+      setValidationErrors((prevErrors) => {
+        const newErrors = { ...prevErrors };
+        delete newErrors.finishing;
+        return newErrors;
+      });
+    }
 
     const filteredOptions = additionalOptions.filter(
       (option) => option.jenis && option.nilai
@@ -255,6 +280,11 @@ const KayuForm = ({
             <FormControlLabel value="Ya" control={<Radio />} label="Ya" />
             <FormControlLabel value="Tidak" control={<Radio />} label="Tidak" />
           </RadioGroup>
+          {validationErrors.barangMentah && (
+            <FormHelperText color="error" variant="body2">
+              {validationErrors.barangMentah}
+            </FormHelperText>
+          )}
         </FormControl>
       </Box>
 
@@ -293,9 +323,9 @@ const KayuForm = ({
                   ))}
                 </Select>
                 {validationErrors.finishing && (
-                  <Typography color="error" variant="body2">
+                  <FormHelperText color="error" variant="body2">
                     {validationErrors.finishing}
-                  </Typography>
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>

@@ -135,27 +135,17 @@ const SofaForm = ({
     const updatedOptions = [...additionalOptions];
     updatedOptions[index][field] = value;
 
-    // Filter additionalOptions untuk mengabaikan entri yang kosong
-    const filteredOptions = updatedOptions.filter(
-      (option) => option.jenis && option.nilai
-    );
-
     setAdditionalOptions(updatedOptions);
 
-    // Kirim data yang sudah difilter ke parent, hanya jika ada isi tambahan
+    // Kirim semua additionalOptions ke parent tanpa memfilter
     onDataChange({
       id_produk: productId,
-      ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }), // Hanya kirim jika ada data valid
+      additionalOptions: updatedOptions,
       warna: selectedWarna,
+      id_warna: selectedWarnaId,
       finishing: selectedFinishing,
+      id_finishing: selectedFinishingId,
     });
-
-    if (field === "jenis" && value === "Kain") {
-      const kainId = updatedOptions[index].nilai;
-      if (kainId) {
-        dispatch(fetchWarnaByKainId(kainId));
-      }
-    }
 
     // Validasi hanya `nilai` jika `jenis` dipilih
     if (updatedOptions[index].jenis && !updatedOptions[index].nilai) {

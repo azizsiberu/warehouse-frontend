@@ -27,12 +27,18 @@ const KomplimenForm = ({
   productId,
   product,
   onDataChange,
-  validationErrors = {},
   setFinishingVisible,
+  validationErrors = {},
+  setValidationErrors,
 }) => {
   const dispatch = useDispatch();
-  const { kainAttributes, kakiAttributes, warnaOptions, finishingOptions } =
-    useSelector((state) => state.products);
+  const {
+    kainAttributes,
+    kakiAttributes,
+    dudukanAttributes,
+    warnaOptions,
+    finishingOptions,
+  } = useSelector((state) => state.products);
 
   const [additionalOptions, setAdditionalOptions] = useState([
     { jenis: "", nilai: "" },
@@ -121,25 +127,27 @@ const KomplimenForm = ({
     const updatedOptions = [...additionalOptions];
     updatedOptions[index][field] = value;
 
-    const filteredOptions = updatedOptions.filter(
-      (option) => option.jenis && option.nilai
-    );
-
     setAdditionalOptions(updatedOptions);
 
+    // Kirim semua additionalOptions ke parent tanpa memfilter
     onDataChange({
       id_produk: productId,
-      ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
+      additionalOptions: updatedOptions,
       warna: selectedWarna,
+      id_warna: selectedWarnaId,
       finishing: selectedFinishing,
+      id_finishing: selectedFinishingId,
     });
 
-    if (field === "jenis" && value === "Kain") {
-      const kainId = updatedOptions[index].nilai;
-      if (kainId) {
-        dispatch(fetchWarnaByKainId(kainId));
-      }
+    // Validasi hanya `nilai` jika `jenis` dipilih
+    if (updatedOptions[index].jenis && !updatedOptions[index].nilai) {
+      validationErrors[`additionalOptions[${index}].nilai`] =
+        "Nilai harus diisi";
+    } else {
+      delete validationErrors[`additionalOptions[${index}].nilai`];
     }
+
+    setValidationErrors({ ...validationErrors });
 
     setFinishingVisible(isFinishingVisible(updatedOptions));
   };
@@ -151,6 +159,14 @@ const KomplimenForm = ({
     const filteredOptions = additionalOptions.filter(
       (option) => option.jenis && option.nilai
     );
+
+    if (!value) {
+      validationErrors.warna = "Warna harus dipilih.";
+    } else {
+      delete validationErrors.warna;
+    }
+
+    setValidationErrors({ ...validationErrors });
 
     onDataChange({
       id_produk: productId,
@@ -169,6 +185,14 @@ const KomplimenForm = ({
     const filteredOptions = additionalOptions.filter(
       (option) => option.jenis && option.nilai
     );
+
+    if (!value) {
+      validationErrors.finishing = "Finishing harus dipilih.";
+    } else {
+      delete validationErrors.finishing;
+    }
+
+    setValidationErrors({ ...validationErrors });
 
     onDataChange({
       id_produk: productId,
@@ -221,6 +245,28 @@ const KomplimenForm = ({
     setFinishingVisible(false);
   };
 
+  const getOptionsForJenis = (jenis) => {
+    switch (jenis) {
+      case "Kain":
+        return kainAttributes.map((option) => ({
+          value: option.id_kain,
+          label: option.kain,
+        }));
+      case "Kaki":
+        return kakiAttributes.map((option) => ({
+          value: option.id_kaki,
+          label: option.jenis_kaki,
+        }));
+      case "Dudukan":
+        return dudukanAttributes.map((option) => ({
+          value: option.id_dudukan,
+          label: option.dudukan,
+        }));
+      default:
+        return [];
+    }
+  };
+
   return (
     <Box sx={{ maxHeight: 350, overflowY: "scroll" }}>
       <Grid container spacing={1}>
@@ -245,6 +291,16 @@ const KomplimenForm = ({
                   Dudukan
                 </Typography>
               )}
+              {productDetails?.bantal_peluk && (
+                <Typography variant="body2" gutterBottom>
+                  Bantal Peluk
+                </Typography>
+              )}
+              {productDetails?.bantal_sandaran && (
+                <Typography variant="body2" gutterBottom>
+                  Bantal Sandaran
+                </Typography>
+              )}
             </Grid>
             <Grid item size={6}>
               <Typography variant="body2" gutterBottom>
@@ -264,6 +320,16 @@ const KomplimenForm = ({
               {productDetails?.dudukan && (
                 <Typography variant="body2" gutterBottom>
                   : {productDetails?.dudukan}
+                </Typography>
+              )}
+              {productDetails?.bantal_peluk && (
+                <Typography variant="body2" gutterBottom>
+                  : {productDetails?.bantal_peluk}
+                </Typography>
+              )}
+              {productDetails?.bantal_sandaran && (
+                <Typography variant="body2" gutterBottom>
+                  : {productDetails?.bantal_sandaran}
                 </Typography>
               )}
             </Grid>
@@ -328,29 +394,74 @@ const KomplimenForm = ({
               </Grid>
 
               <Grid size={5}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Pilih Nilai</InputLabel>
-                  <Select
+                {option.jenis === "Kain" ||
+                option.jenis === "Kaki" ||
+                option.jenis === "Dudukan" ? (
+                  <FormControl
+                    fullWidth
+                    size="small"
+                    error={
+                      !!validationErrors[`additionalOptions[${index}].nilai`]
+                    }
+                  >
+                    <InputLabel>Pilih Nilai</InputLabel>
+                    <Select
+                      value={option.nilai}
+                      label="Pilih Nilai"
+                      onChange={(e) =>
+                        handleAdditionalChange(index, "nilai", e.target.value)
+                      }
+                    >
+                      {getOptionsForJenis(option.jenis).map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {validationErrors[`additionalOptions[${index}].nilai`] && (
+                      <FormHelperText>
+                        {validationErrors[`additionalOptions[${index}].nilai`]}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                ) : option.jenis === "Ukuran" ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Nilai"
                     value={option.nilai}
-                    label="Pilih Nilai"
                     onChange={(e) =>
                       handleAdditionalChange(index, "nilai", e.target.value)
                     }
-                  >
-                    {option.jenis === "Kain" &&
-                      kainAttributes.map((opt) => (
-                        <MenuItem key={opt.id_kain} value={opt.id_kain}>
-                          {opt.kain}
-                        </MenuItem>
-                      ))}
-                    {option.jenis === "Kaki" &&
-                      kakiAttributes.map((opt) => (
-                        <MenuItem key={opt.id_kaki} value={opt.id_kaki}>
-                          {opt.jenis_kaki}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
+                    placeholder="Masukkan ukuran"
+                    error={
+                      !!validationErrors[`additionalOptions[${index}].nilai`]
+                    }
+                    helperText={
+                      validationErrors[`additionalOptions[${index}].nilai`] ||
+                      ""
+                    }
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type="number"
+                    label="Nilai"
+                    value={option.nilai}
+                    onChange={(e) =>
+                      handleAdditionalChange(index, "nilai", e.target.value)
+                    }
+                    placeholder="Masukkan nilai"
+                    error={
+                      !!validationErrors[`additionalOptions[${index}].nilai`]
+                    }
+                    helperText={
+                      validationErrors[`additionalOptions[${index}].nilai`] ||
+                      ""
+                    }
+                  />
+                )}
               </Grid>
               <Grid item xs={2} display="flex">
                 <IconButton

@@ -37,7 +37,10 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
   };
 
   const handleFormDataChange = (data) => {
-    setFormData(data);
+    setFormData((prevData) => ({
+      ...prevData,
+      ...data,
+    }));
   };
 
   const incrementQuantity = () => {
@@ -94,6 +97,42 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
       });
     }
 
+    // Validasi untuk KayuForm
+    if (product.jenis_produk === "Kayu") {
+      if (!formData.barangMentah) {
+        errors.barangMentah = "Pilihan Barang Mentah harus dipilih.";
+        isValid = false;
+      } else if (formData.barangMentah === "Tidak" && !formData.finishing) {
+        errors.finishing = "Finishing harus diisi jika bukan barang mentah.";
+        isValid = false;
+      }
+
+      (formData.additionalOptions || []).forEach((option, index) => {
+        if (option.jenis && !option.nilai) {
+          errors[`additionalOptions[${index}].nilai`] = "Nilai harus diisi.";
+          isValid = false;
+        }
+      });
+    }
+
+    // Validasi untuk KomplimenForm
+    if (product.jenis_produk === "Komplimen") {
+      if (!formData.warna) {
+        errors.warna = "Warna harus diisi.";
+        isValid = false;
+      }
+      if (finishingVisible && !formData.finishing) {
+        errors.finishing = "Finishing harus diisi.";
+        isValid = false;
+      }
+      (formData.additionalOptions || []).forEach((option, index) => {
+        if (option.jenis && !option.nilai) {
+          errors[`additionalOptions[${index}].nilai`] = "Nilai harus diisi.";
+          isValid = false;
+        }
+      });
+    }
+
     setValidationErrors(errors);
     return isValid;
   };
@@ -118,6 +157,8 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
             onDataChange={handleFormDataChange}
             onAdditionalChange={handleAdditionalChange}
             setFinishingVisible={setFinishingVisible}
+            validationErrors={validationErrors}
+            setValidationErrors={setValidationErrors}
           />
         );
       case "Fabrikasi":
@@ -136,6 +177,8 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
             onDataChange={handleFormDataChange}
             onAdditionalChange={handleAdditionalChange}
             setFinishingVisible={setFinishingVisible}
+            validationErrors={validationErrors}
+            setValidationErrors={setValidationErrors}
           />
         );
       default:
