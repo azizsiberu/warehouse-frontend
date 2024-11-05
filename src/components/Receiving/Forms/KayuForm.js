@@ -61,6 +61,7 @@ const KayuForm = ({
     onDataChange({
       id_produk: productId,
       additionalOptions: updatedOptions,
+      productDetails,
       finishing: selectedFinishing,
       id_finishing: selectedFinishingId,
       barangMentah,
@@ -84,9 +85,14 @@ const KayuForm = ({
       setSelectedFinishingId("");
     }
 
+    const filteredOptions = additionalOptions.filter(
+      (option) => option.jenis && option.nilai
+    );
+
     onDataChange({
       id_produk: productId,
-      additionalOptions,
+      additionalOptions: filteredOptions, // Pastikan filteredOptions digunakan di sini
+      productDetails,
       finishing: value === "Ya" ? "" : selectedFinishing,
       id_finishing: value === "Ya" ? "" : selectedFinishingId,
       barangMentah: value,
@@ -116,6 +122,7 @@ const KayuForm = ({
     onDataChange({
       id_produk: productId,
       ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
+      productDetails,
       finishing: selectedFinishing,
       id_finishing: selectedFinishingId,
       barangMentah,

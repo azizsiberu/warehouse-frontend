@@ -135,19 +135,33 @@ const SofaForm = ({
     const updatedOptions = [...additionalOptions];
     updatedOptions[index][field] = value;
 
+    // Mendapatkan label (nama) selain ID untuk kaki, kain, atau dudukan
+    if (
+      field === "nilai" &&
+      (updatedOptions[index].jenis === "Kain" ||
+        updatedOptions[index].jenis === "Kaki" ||
+        updatedOptions[index].jenis === "Dudukan")
+    ) {
+      const selectedOption = getOptionsForJenis(
+        updatedOptions[index].jenis
+      ).find((opt) => opt.value === value);
+      updatedOptions[index].label = selectedOption ? selectedOption.label : ""; // Menyimpan label untuk opsi yang dipilih
+    }
+
     setAdditionalOptions(updatedOptions);
 
-    // Kirim semua additionalOptions ke parent tanpa memfilter
+    // Kirim data lengkap termasuk label untuk opsi `kain`, `kaki`, atau `dudukan`
     onDataChange({
       id_produk: productId,
       additionalOptions: updatedOptions,
+      productDetails,
       warna: selectedWarna,
       id_warna: selectedWarnaId,
       finishing: selectedFinishing,
       id_finishing: selectedFinishingId,
     });
 
-    // Validasi hanya `nilai` jika `jenis` dipilih
+    // Validasi `nilai` jika `jenis` dipilih
     if (updatedOptions[index].jenis && !updatedOptions[index].nilai) {
       validationErrors[`additionalOptions[${index}].nilai`] =
         "Nilai harus diisi";
@@ -156,7 +170,6 @@ const SofaForm = ({
     }
 
     setValidationErrors({ ...validationErrors });
-
     setFinishingVisible(isFinishingVisible(updatedOptions));
   };
 
@@ -170,7 +183,8 @@ const SofaForm = ({
 
     onDataChange({
       id_produk: productId,
-      ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }), // Hanya kirim jika ada data valid
+      ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
+      productDetails,
       warna: value,
       id_warna: id,
       finishing: selectedFinishing,
@@ -188,7 +202,8 @@ const SofaForm = ({
 
     onDataChange({
       id_produk: productId,
-      ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }), // Hanya kirim jika ada data valid
+      ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
+      productDetails,
       warna: selectedWarna,
       id_warna: selectedWarnaId,
       finishing: value,

@@ -127,12 +127,26 @@ const KomplimenForm = ({
     const updatedOptions = [...additionalOptions];
     updatedOptions[index][field] = value;
 
+    // Mendapatkan label (nama) selain ID untuk opsi `kain`, `kaki`, atau `dudukan`
+    if (
+      field === "nilai" &&
+      (updatedOptions[index].jenis === "Kain" ||
+        updatedOptions[index].jenis === "Kaki" ||
+        updatedOptions[index].jenis === "Dudukan")
+    ) {
+      const selectedOption = getOptionsForJenis(
+        updatedOptions[index].jenis
+      ).find((opt) => opt.value === value);
+      updatedOptions[index].label = selectedOption ? selectedOption.label : ""; // Menyimpan label untuk opsi yang dipilih
+    }
+
     setAdditionalOptions(updatedOptions);
 
-    // Kirim semua additionalOptions ke parent tanpa memfilter
+    // Kirim data lengkap termasuk label untuk opsi `kain`, `kaki`, atau `dudukan`
     onDataChange({
       id_produk: productId,
       additionalOptions: updatedOptions,
+      productDetails,
       warna: selectedWarna,
       id_warna: selectedWarnaId,
       finishing: selectedFinishing,
@@ -148,7 +162,6 @@ const KomplimenForm = ({
     }
 
     setValidationErrors({ ...validationErrors });
-
     setFinishingVisible(isFinishingVisible(updatedOptions));
   };
 
@@ -171,6 +184,7 @@ const KomplimenForm = ({
     onDataChange({
       id_produk: productId,
       ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
+      productDetails,
       warna: value,
       id_warna: id,
       finishing: selectedFinishing,
@@ -197,6 +211,7 @@ const KomplimenForm = ({
     onDataChange({
       id_produk: productId,
       ...(filteredOptions.length > 0 && { additionalOptions: filteredOptions }),
+      productDetails,
       warna: selectedWarna,
       id_warna: selectedWarnaId,
       finishing: value,

@@ -64,6 +64,7 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
 
     const submissionData = {
       product, // Kirim seluruh objek `product`
+      productDetails: formData.productDetails,
       id_produk: product.id_produk,
       ...formData,
       jumlah: quantity,

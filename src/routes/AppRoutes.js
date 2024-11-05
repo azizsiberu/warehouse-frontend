@@ -14,6 +14,8 @@ import DashboardView from "../views/DashboardView";
 import ProductManagementView from "../views/ProductManagementView";
 import ProductDetails from "../components/ProductManagement/ProductDetails";
 import ReceivingManagementView from "../views/ReceivingStock";
+import ReceivingDetailView from "../views/ReceivingDetailView";
+import IncomingLabelView from "../views/IncomingLabelView";
 import { clearAuth } from "../redux/reducers/authReducer";
 
 const APP_NAME = "Ajeg Gudang"; // Define your application name here
@@ -93,6 +95,16 @@ const AppRoutes = () => {
               element={
                 <ReceivingManagementView setPageTitle={updateDocumentTitle} />
               }
+            />
+            <Route
+              path="/receiving-detail/"
+              element={
+                <ReceivingDetailView setPageTitle={updateDocumentTitle} />
+              }
+            />
+            <Route
+              path="/incoming-label"
+              element={<IncomingLabelView setPageTitle={updateDocumentTitle} />}
             />
             {/* Tambahkan rute lainnya yang dilindungi di sini */}
           </Route>

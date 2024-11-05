@@ -135,4 +135,9 @@ export const getWarehouses = async () => {
   return response.data;
 };
 
+export const submitIncomingStock = async (payload) => {
+  const response = await api.post("/api/incoming-stocks", payload);
+  return response.data; // Kembalikan data dari API setelah berhasil
+};
+
 export default api;

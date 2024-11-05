@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -28,8 +29,9 @@ const RightSidebar = ({
 }) => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const { locations } = useSelector((state) => state.warehouses); // Mengambil lokasi dari Redux
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Ambil lokasi warehouse saat komponen dimuat
   useEffect(() => {
@@ -41,6 +43,14 @@ const RightSidebar = ({
     (total, productData) => total + productData.jumlah,
     0
   );
+
+  const isDisabled = !selectedLocation || totalQuantity === 0;
+
+  const handleProceed = () => {
+    navigate("/receiving-detail", {
+      state: { selectedProducts, selectedLocation },
+    });
+  };
 
   return (
     <>
@@ -156,8 +166,14 @@ const RightSidebar = ({
               <InputLabel id="select-location-label">Pilih Lokasi</InputLabel>
               <Select
                 labelId="select-location-label"
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
+                value={selectedLocation?.id || ""}
+                onChange={(e) => {
+                  // Cari objek lokasi lengkap berdasarkan ID yang dipilih
+                  const selected = locations.find(
+                    (location) => location.id === e.target.value
+                  );
+                  setSelectedLocation(selected); // Simpan objek lokasi lengkap
+                }}
                 label="Pilih Lokasi"
               >
                 {locations.map((location) => (
@@ -167,7 +183,13 @@ const RightSidebar = ({
                 ))}
               </Select>
             </FormControl>
-            <Button variant="contained" color="primary" fullWidth>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              disabled={isDisabled}
+              onClick={handleProceed}
+            >
               Lanjutkan Proses
             </Button>
           </Box>
@@ -226,7 +248,41 @@ const RightSidebar = ({
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               Total Produk: {totalQuantity}
             </Typography>
-            <Button variant="contained" color="primary" fullWidth>
+
+            {/* Pilihan Lokasi Warehouse */}
+            <FormControl
+              fullWidth
+              variant="outlined"
+              size="small"
+              sx={{ mb: 2 }}
+            >
+              <InputLabel id="select-location-label">Pilih Lokasi</InputLabel>
+              <Select
+                labelId="select-location-label"
+                value={selectedLocation?.id || ""}
+                onChange={(e) => {
+                  // Cari objek lokasi lengkap berdasarkan ID yang dipilih
+                  const selected = locations.find(
+                    (location) => location.id === e.target.value
+                  );
+                  setSelectedLocation(selected); // Simpan objek lokasi lengkap
+                }}
+                label="Pilih Lokasi"
+              >
+                {locations.map((location) => (
+                  <MenuItem key={location.id} value={location.id}>
+                    {location.lokasi}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              disabled={isDisabled}
+              onClick={handleProceed}
+            >
               Lanjutkan Proses
             </Button>
           </Box>

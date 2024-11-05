@@ -14,7 +14,7 @@ const ReceivingManagementView = ({ setPageTitle }) => {
   };
 
   useEffect(() => {
-    const title = "Receiving Management";
+    const title = "Stok Masuk";
     setPageTitle(title);
     document.title = title;
   }, [setPageTitle]);
