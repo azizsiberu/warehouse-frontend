@@ -18,23 +18,65 @@ const SummaryActions = ({ onCancel, selectedProducts, selectedLocation }) => {
   const [showAlert, setShowAlert] = useState(false);
 
   const handleSubmit = async () => {
-    const selectedProduct = selectedProducts[0];
+    const incompleteProducts = selectedProducts.filter(
+      (product) =>
+        !product.id_produk ||
+        !product.jumlah ||
+        !selectedLocation?.id ||
+        !userId
+    );
 
-    const payload = {
-      id_produk: selectedProduct.id_produk,
-      id_warna: selectedProduct.id_warna,
-      id_finishing: selectedProduct.id_finishing,
-      is_custom: selectedProduct.additionalOptions?.length > 0,
-      is_raw_material: selectedProduct.is_raw_material || false,
-      jumlah: selectedProduct.jumlah,
-      id_user: userId, // Menggunakan userId dari Redux
-      id_lokasi: selectedLocation.id,
-      additionalOptions: selectedProduct.additionalOptions?.map((option) => ({
-        jenis: option.jenis,
-        nilai: option.nilai,
-        label: option.label || null,
-      })),
-    };
+    if (incompleteProducts.length > 0) {
+      setErrorMessage("Beberapa produk memiliki data yang tidak lengkap.");
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 3000);
+      return;
+    }
+
+    // Membuat payload sesuai struktur baru tanpa menggunakan additionalOptions
+    const payload = selectedProducts.map((product) => {
+      console.log("product.is_raw_material:", product.is_raw_material); // Log untuk verifikasi
+
+      // Tentukan nilai default untuk kolom kustom
+      const mappedValues = {
+        id_produk: product.id_produk,
+        id_warna: product.id_warna || null,
+        id_finishing: product.id_finishing || null,
+        is_custom: product.additionalOptions?.length > 0 || false,
+        is_raw_material: product.barangMentah === "Ya", // Ambil dari barangMentah
+        jumlah: product.jumlah,
+        id_user: userId,
+        id_lokasi: selectedLocation.id,
+        ukuran: null,
+        id_kain: null,
+        id_kaki: null,
+        id_dudukan: null,
+        bantal_peluk: null,
+        bantal_sandaran: null,
+        kantong_remot: null,
+      };
+
+      // Loop untuk memasukkan additionalOptions ke kolom kustom
+      product.additionalOptions?.forEach((option) => {
+        if (option.jenis === "Ukuran") mappedValues.ukuran = option.nilai;
+        else if (option.jenis === "Kain") mappedValues.id_kain = option.nilai;
+        else if (option.jenis === "Kaki") mappedValues.id_kaki = option.nilai;
+        else if (option.jenis === "Dudukan")
+          mappedValues.id_dudukan = option.nilai;
+        else if (option.jenis === "Bantal Peluk")
+          mappedValues.bantal_peluk = option.nilai;
+        else if (option.jenis === "Bantal Sandaran")
+          mappedValues.bantal_sandaran = option.nilai;
+        else if (option.jenis === "Kantong Remote")
+          mappedValues.kantong_remot = option.nilai;
+      });
+
+      return mappedValues;
+    });
+
+    console.log("Payload data to be sent:", JSON.stringify(payload, null, 2));
 
     const response = await dispatch(submitIncomingStockThunk(payload));
 
@@ -43,12 +85,10 @@ const SummaryActions = ({ onCancel, selectedProducts, selectedLocation }) => {
         state: { selectedProducts, selectedLocation },
       });
     } else {
-      // Tangani kesalahan dengan memperbarui errorMessage dan missingFields
       setErrorMessage(response.message);
       setMissingFields(response.missingFields);
       setShowAlert(true);
 
-      // Hide alert after 3 seconds
       setTimeout(() => {
         setShowAlert(false);
       }, 3000);

@@ -16,6 +16,9 @@ import ProductDetails from "../components/ProductManagement/ProductDetails";
 import ReceivingManagementView from "../views/ReceivingStock";
 import ReceivingDetailView from "../views/ReceivingDetailView";
 import IncomingLabelView from "../views/IncomingLabelView";
+import OutgoingStockView from "../views/OutgoingStockView";
+import OutgoingDetailView from "../views/OutgoingDetailView";
+import OutgoingLabelView from "../views/OutgoingLabelView";
 import { clearAuth } from "../redux/reducers/authReducer";
 
 const APP_NAME = "Ajeg Gudang"; // Define your application name here
@@ -105,6 +108,20 @@ const AppRoutes = () => {
             <Route
               path="/incoming-label"
               element={<IncomingLabelView setPageTitle={updateDocumentTitle} />}
+            />
+            <Route
+              path="/outgoing"
+              element={<OutgoingStockView setPageTitle={updateDocumentTitle} />}
+            />
+            <Route
+              path="/outgoing-detail"
+              element={
+                <OutgoingDetailView setPageTitle={updateDocumentTitle} />
+              }
+            />
+            <Route
+              path="/outgoing-label"
+              element={<OutgoingLabelView setPageTitle={updateDocumentTitle} />}
             />
             {/* Tambahkan rute lainnya yang dilindungi di sini */}
           </Route>

@@ -31,8 +31,23 @@ const IncomingLabel = ({ selectedProducts, selectedLocation }) => {
           showImage={false}
         />
       </Box>
-      <Box sx={{ mt: 3, textAlign: "center" }}>
-        <Button variant="contained" color="primary" onClick={handlePrint}>
+      <Box
+        sx={{
+          textAlign: "center",
+          position: "sticky",
+          bottom: 0,
+          backgroundColor: "#fff",
+          py: 2,
+          zIndex: 10,
+          borderTop: "1px solid #ddd",
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handlePrint}
+        >
           Print
         </Button>
       </Box>

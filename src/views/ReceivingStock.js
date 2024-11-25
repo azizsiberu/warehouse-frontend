@@ -5,13 +5,6 @@ import StockForm from "../components/Receiving/StockForm"; // Form untuk menamba
 
 const ReceivingManagementView = ({ setPageTitle }) => {
   const [products, setProducts] = useState([]);
-  const [isAddingStock, setIsAddingStock] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const handleAddStock = (product) => {
-    setSelectedProduct(product);
-    setIsAddingStock(true);
-  };
 
   useEffect(() => {
     const title = "Stok Masuk";
@@ -19,32 +12,9 @@ const ReceivingManagementView = ({ setPageTitle }) => {
     document.title = title;
   }, [setPageTitle]);
 
-  const handleSaveStock = (stockData) => {
-    // Update stok produk dengan data baru
-    const updatedProducts = products.map((product) =>
-      product.name === selectedProduct.name
-        ? { ...product, stock: stockData.stock }
-        : product
-    );
-    setProducts(updatedProducts);
-    setIsAddingStock(false);
-  };
-
-  const handleCancelAddStock = () => {
-    setIsAddingStock(false);
-  };
-
   return (
     <div>
-      {isAddingStock ? (
-        <StockForm
-          product={selectedProduct}
-          onSave={handleSaveStock}
-          onCancel={handleCancelAddStock}
-        />
-      ) : (
-        <ReceivingList products={products} onAddStock={handleAddStock} />
-      )}
+      <ReceivingList products={products} />
     </div>
   );
 };

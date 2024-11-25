@@ -27,9 +27,12 @@ const ProductCard = ({ product, buttonLabel, onClick }) => {
       />
 
       <CardContent sx={{ flexGrow: 1 }}>
+        <Typography variant="body2" color="text.secondary">
+          {product.kategori || "Kategori tidak tersedia"} |{" "}
+          {product.subkategori || "Subkategori tidak tersedia"}
+        </Typography>
         <Typography
           variant="h6"
-          gutterBottom
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -39,24 +42,6 @@ const ProductCard = ({ product, buttonLabel, onClick }) => {
         >
           {product.nama}
         </Typography>
-
-        <Typography variant="body2" color="text.secondary">
-          {product.kategori || "Kategori tidak tersedia"} |{" "}
-          {product.subkategori || "Subkategori tidak tersedia"}
-        </Typography>
-
-        <Box sx={{ mt: 1 }}>
-          <Typography
-            variant="h6"
-            color="primary"
-            sx={{ fontFamily: "Open Sans" }}
-          >
-            Rp{" "}
-            {product.harga_jual
-              ? Number(product.harga_jual).toLocaleString("id-ID")
-              : "Harga tidak tersedia"}
-          </Typography>
-        </Box>
 
         <Typography variant="body2" color="text.secondary">
           Vendor: {product.vendor || "Vendor tidak tersedia"}

@@ -21,7 +21,7 @@ const menuItems = [
     label: "Penerimaan Barang",
     route: "/receiving",
   }, // Penerimaan Baru, Riwayat Penerimaan
-  { icon: MdOutlineFireTruck, label: "Pengiriman Barang", route: "/shipping" }, // Pengiriman Baru, Riwayat Pengiriman
+  { icon: MdOutlineFireTruck, label: "Pengiriman Barang", route: "/outgoing" }, // Pengiriman Baru, Riwayat Pengiriman
   {
     icon: MdAppsOutage,
     label: "Manajemen Stok",

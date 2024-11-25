@@ -9,6 +9,7 @@ import {
   Drawer,
   Divider,
   Button,
+  useMediaQuery,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import {
@@ -19,7 +20,6 @@ import {
 } from "react-icons/md";
 import ProductCard from "../ProductCard";
 import { getProducts } from "../../services/api";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import Loading from "../Loading";
 import RightSidebar from "./RightSidebar";
 import { useNavigate } from "react-router-dom";
@@ -102,13 +102,6 @@ const ReceivingList = () => {
     setFilteredProducts(sortProductsByName(filtered));
   };
 
-  const handleCardClick = (product) => {
-    const productNameSlug = product.nama.replace(/\s+/g, "-").toLowerCase();
-    navigate(`/product/${product.id_produk}/${productNameSlug}`, {
-      state: { id_product: product.id_produk },
-    });
-  };
-
   const handleSubmitProduct = (productData) => {
     setSelectedProducts((prevProducts) => [...prevProducts, productData]);
   };
@@ -124,7 +117,7 @@ const ReceivingList = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "row", height: "100%" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 8, lg: 9 }}>
           {" "}

@@ -140,4 +140,74 @@ export const submitIncomingStock = async (payload) => {
   return response.data; // Kembalikan data dari API setelah berhasil
 };
 
+// Fungsi untuk mendapatkan semua produk dari final stock
+export const getAllFinalStock = async () => {
+  const response = await api.get("/api/final-stocks");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan produk final stock berdasarkan lokasi
+export const getAvailableFinalStockByLocation = async (id_lokasi) => {
+  const response = await api.get(`/api/final-stocks/available`, {
+    params: { id_lokasi },
+  });
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan detail produk final stock berdasarkan id_lokasi dan id_produk
+export const getFinalStockDetails = async (id_lokasi, id_produk) => {
+  const response = await api.get(`/api/final-stocks/details`, {
+    params: { id_lokasi, id_produk },
+  });
+  return response.data;
+};
+
+// Fungsi untuk membuat outgoing stock
+export const createOutgoingStock = async (payload) => {
+  console.log("Payload to be sent to backend:", payload); // Debug log
+  const response = await api.post("/api/outgoing-stocks", payload);
+  console.log("Response from backend:", response); // Debug log
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan semua pelanggan
+export const getCustomers = async () => {
+  const response = await api.get("/api/customers/");
+  return response.data; // Mengembalikan data pelanggan dari API
+};
+
+// Fungsi untuk mendapatkan semua data dari team_gudang
+export const getTeamGudang = async () => {
+  const response = await api.get("/api/team-gudang");
+  return response.data; // Mengembalikan data dari API
+};
+
+// Fungsi untuk menambahkan anggota ke team_gudang
+export const createTeamGudangMember = async (memberData) => {
+  const response = await api.post("/api/team-gudang", memberData);
+  return response.data; // Mengembalikan data dari API setelah berhasil ditambahkan
+};
+
+export const getKendaraan = async () => {
+  const response = await api.get("/api/kendaraan");
+  return response.data;
+};
+
+export const createKendaraan = async (data) => {
+  const response = await api.post("/api/kendaraan", data);
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan semua data dari ekspedisi_rekanan
+export const getEkspedisiRekanan = async () => {
+  const response = await api.get("/api/ekspedisi-rekanan");
+  return response.data; // Mengembalikan data dari API
+};
+
+// Fungsi untuk menambahkan data ekspedisi rekanan
+export const createEkspedisiRekanan = async (expeditionData) => {
+  const response = await api.post("/api/ekspedisi-rekanan", expeditionData);
+  return response.data; // Mengembalikan data dari API setelah berhasil ditambahkan
+};
+
 export default api;
