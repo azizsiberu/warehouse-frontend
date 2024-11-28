@@ -1,5 +1,4 @@
 // path: /src/components/Outgoing/OutgoingDetail/DeliveryOption.js
-
 import React, { useState } from "react";
 import {
   Box,
@@ -7,38 +6,41 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  Button,
 } from "@mui/material";
 import DriverForm from "./DriverForm";
 import ExpeditionForm from "./ExpeditionForm";
 
 const DeliveryOption = ({ onSave }) => {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [deliveryData, setDeliveryData] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(""); // "kurirSendiri" or "ekspedisiRekanan"
+  const [driverData, setDriverData] = useState(null); // Data dari DriverForm
+  const [expeditionData, setExpeditionData] = useState(null); // Data dari ExpeditionForm
 
   const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-    setDeliveryData(null); // Reset delivery data when the option changes
-  };
+    const value = event.target.value;
+    console.log("Delivery option selected:", value);
 
-  const handleSaveDriver = (data) => {
-    setDeliveryData({ type: "kurirSendiri", ...data });
-  };
+    setSelectedOption(value);
 
-  const handleDriverChange = (data) => {
-    console.log("Driver and Partners data updated:", data);
-  };
-
-  const handleSaveExpedition = (data) => {
-    setDeliveryData({ type: "ekspedisiRekanan", ...data });
-  };
-
-  const handleFinalSave = () => {
-    if (!deliveryData) {
-      alert("Harap lengkapi informasi pengiriman.");
-      return;
+    // Reset data saat opsi berubah
+    if (value === "kurirSendiri") {
+      setExpeditionData(null); // Hapus data ekspedisi jika beralih ke Kurir Sendiri
+      onSave({ type: value, data: driverData });
+    } else if (value === "ekspedisiRekanan") {
+      setDriverData(null); // Hapus data kurir jika beralih ke Ekspedisi Rekanan
+      onSave({ type: value, data: expeditionData });
     }
-    onSave(deliveryData);
+  };
+
+  const handleDriverSave = (data) => {
+    console.log("Driver Data Saved:", data);
+    setDriverData(data); // Simpan data driver di state
+    onSave({ type: "kurirSendiri", data }); // Kirim data ke parent
+  };
+
+  const handleExpeditionSave = (data) => {
+    console.log("Expedition Data Saved:", data);
+    setExpeditionData(data); // Simpan data ekspedisi di state
+    onSave({ type: "ekspedisiRekanan", data }); // Kirim data ke parent
   };
 
   return (
@@ -63,11 +65,14 @@ const DeliveryOption = ({ onSave }) => {
         />
       </RadioGroup>
 
+      {/* Form untuk Kurir Sendiri */}
       {selectedOption === "kurirSendiri" && (
-        <DriverForm onChange={handleDriverChange} />
+        <DriverForm onSave={handleDriverSave} />
       )}
+
+      {/* Form untuk Ekspedisi Rekanan */}
       {selectedOption === "ekspedisiRekanan" && (
-        <ExpeditionForm onSave={handleSaveExpedition} />
+        <ExpeditionForm onSave={handleExpeditionSave} />
       )}
     </Box>
   );

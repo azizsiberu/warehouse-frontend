@@ -21,10 +21,17 @@ const OutgoingLabelView = ({ setPageTitle }) => {
     }
   }, [setPageTitle, selectedProducts, selectedDestination, navigate]);
 
+  useEffect(() => {
+    console.log("Data di OutgoingLabelView:");
+    console.log("Selected Products:", selectedProducts);
+    console.log("Selected Destination:", selectedDestination);
+  }, [selectedProducts, selectedDestination]);
+
   return (
     <OutgoingLabel
       selectedProducts={selectedProducts}
       selectedDestination={selectedDestination}
+      deliveryData={location.state?.deliveryData}
     />
   );
 };

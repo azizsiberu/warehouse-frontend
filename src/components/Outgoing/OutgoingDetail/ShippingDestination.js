@@ -1,5 +1,4 @@
 // path: /src/components/Outgoing/OutgoingDetail/ShippingDestination.js
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -36,32 +35,52 @@ const ShippingDestination = ({ onSelectDestination, onSelectCustomer }) => {
   const [selectedCustomer, setSelectedCustomer] = useState(null); // Untuk pelanggan yang dipilih
 
   useEffect(() => {
-    // Ambil data lokasi gudang dan pelanggan
+    console.log("Fetching warehouses and customers...");
     dispatch(fetchWarehouses());
     dispatch(fetchCustomers());
   }, [dispatch]);
 
+  useEffect(() => {
+    console.log("Loaded Warehouses:", locations);
+    console.log("Loaded Customers:", customers);
+  }, [locations, customers]);
+
   const handleDestinationChange = (event) => {
     const value = event.target.value;
 
+    console.log("Destination dropdown changed:", value);
     setSelectedDestination(value);
 
     if (value === "customer") {
-      onSelectDestination({ type: "pelanggan", id: null });
+      const destination = { type: "pelanggan", id: null };
+      console.log("Selected Destination updated (Customer):", destination);
+      onSelectDestination(destination);
     } else {
-      onSelectDestination({ type: "gudang", id: value });
+      const destination = { type: "gudang", id: value };
+      console.log("Selected Destination updated (Warehouse):", destination);
+      onSelectDestination(destination);
     }
 
     // Reset pilihan pelanggan jika tujuan bukan "Pelanggan"
     if (value !== "customer") {
+      console.log(
+        "Resetting selected customer since destination is not 'Customer'."
+      );
       setSelectedCustomer(null);
       onSelectCustomer(null);
     }
   };
 
   const handleCustomerSelect = (event, newValue) => {
+    console.log("Customer selection changed:", newValue);
     setSelectedCustomer(newValue);
-    onSelectCustomer(newValue);
+
+    if (newValue) {
+      const customerData = { type: "pelanggan", id: newValue.id };
+      console.log("Selected Customer updated:", customerData);
+      onSelectCustomer(newValue);
+      onSelectDestination(customerData);
+    }
   };
 
   return (
@@ -173,48 +192,44 @@ const ShippingDestination = ({ onSelectDestination, onSelectCustomer }) => {
                 </Grid>
               </Grid>
 
-              <Grid container spacing={1}>
-                <Grid size={3}>
+              <Grid container spacing={1} sx={{ mb: 2 }}>
+                <Grid size={{ xs: 6, md: 3 }}>
                   <TextField
                     fullWidth
                     label="Provinsi"
                     size="small"
                     name="provinsi"
                     value={selectedCustomer.provinsi || ""}
-                    sx={{ mb: 2 }}
                     disabled
                   />
                 </Grid>
-                <Grid size={3}>
+                <Grid size={{ xs: 6, md: 3 }}>
                   <TextField
                     fullWidth
                     label="Kota"
                     size="small"
                     name="kota"
                     value={selectedCustomer.kabupaten || ""}
-                    sx={{ mb: 2 }}
                     disabled
                   />
                 </Grid>
-                <Grid size={3}>
+                <Grid size={{ xs: 6, md: 3 }}>
                   <TextField
                     fullWidth
                     label="Kecamatan"
                     size="small"
                     name="kecamatan"
                     value={selectedCustomer.kecamatan || ""}
-                    sx={{ mb: 2 }}
                     disabled
                   />
                 </Grid>
-                <Grid size={3}>
+                <Grid size={{ xs: 6, md: 3 }}>
                   <TextField
                     fullWidth
                     label="Kelurahan"
                     size="small"
                     name="kelurahan"
                     value={selectedCustomer.kelurahan || ""}
-                    sx={{ mb: 2 }}
                     disabled
                   />
                 </Grid>

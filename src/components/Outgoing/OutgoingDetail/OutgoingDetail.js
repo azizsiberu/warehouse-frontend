@@ -1,5 +1,5 @@
 // path: /src/components/Outgoing/OutgoingDetail/OutgoingDetail.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Divider, Chip } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -19,12 +19,14 @@ const OutgoingDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const userId = useSelector((state) => state.auth.userId); // Ambil id_user dari Redux state
-  console.log("User ID:", userId);
-
+  // Redux State
+  const userId = useSelector((state) => state.auth.userId);
   const { selectedProducts, selectedDestination, loading, error } = useSelector(
     (state) => state.outgoingStock
   );
+
+  // Local State
+  const [deliveryData, setDeliveryData] = useState(null); // Data dari DeliveryOption
 
   useEffect(() => {
     // Jika selectedProducts kosong, ambil dari state navigasi
@@ -33,22 +35,43 @@ const OutgoingDetail = () => {
     }
   }, [dispatch, location.state, selectedProducts]);
 
-  useEffect(() => {
-    console.log("Selected Products:", selectedProducts);
-  }, [selectedProducts]);
-
-  useEffect(() => {
-    console.log("Selected Destination:", selectedDestination);
-    if (selectedDestination?.type === "pelanggan") {
-      console.log("Selected Customer ID:", selectedDestination.id);
-    }
-  }, [selectedDestination]);
-
   const handleCancel = () => navigate(-1);
 
   const handleSubmit = async () => {
-    if (!selectedProducts.length || !selectedDestination) {
-      alert("Produk atau tujuan pengiriman tidak boleh kosong.");
+    if (
+      !selectedDestination ||
+      (!selectedDestination.id && !selectedDestination.type)
+    ) {
+      alert("Pilih tujuan pengiriman terlebih dahulu.");
+      return;
+    }
+
+    if (!deliveryData) {
+      alert("Pilih opsi pengiriman terlebih dahulu.");
+      return;
+    }
+
+    if (deliveryData.type === "kurirSendiri") {
+      if (!deliveryData.data?.driver || !deliveryData.data?.driver?.id) {
+        alert("Pilih atau tambahkan driver terlebih dahulu.");
+        return;
+      }
+      if (
+        !deliveryData.data?.vehicle ||
+        !deliveryData.data?.vehicle?.nomor_polisi
+      ) {
+        alert("Pilih atau tambahkan kendaraan terlebih dahulu.");
+        return;
+      }
+    } else if (deliveryData.type === "ekspedisiRekanan") {
+      if (!deliveryData.data?.id) {
+        alert("Pilih atau tambahkan ekspedisi terlebih dahulu.");
+        return;
+      }
+    }
+
+    if (!selectedProducts || selectedProducts.length === 0) {
+      alert("Pilih setidaknya satu produk untuk dikirim.");
       return;
     }
 
@@ -57,70 +80,67 @@ const OutgoingDetail = () => {
       return;
     }
 
-    console.log("Selected Products yg akan dikirim:", selectedProducts);
-    console.log("Selected Destination yg akan dikirim:", selectedDestination);
-    console.log("ID User yg akan dikirim:", userId);
-
     const payload = selectedProducts.flatMap((product) =>
       product.variants.map((variant) => ({
-        id_final_stock: variant.id, // ID Final Stock
-        jumlah: variant.jumlah, // Jumlah produk
-        id_user: userId, // ID User
+        id_final_stock: variant.id,
+        jumlah: variant.jumlah,
+        id_user: userId,
         id_lokasi:
           selectedDestination.type === "gudang" ? selectedDestination.id : null,
-        id_pelanggan:
+        id_customer:
           selectedDestination.type === "pelanggan"
             ? selectedDestination.id
             : null,
+        id_kurir:
+          deliveryData.type === "kurirSendiri"
+            ? deliveryData.data.driver?.id
+            : null,
+        id_kendaraan:
+          deliveryData.type === "kurirSendiri"
+            ? deliveryData.data.vehicle?.id
+            : null,
+        id_ekspedisi:
+          deliveryData.type === "ekspedisiRekanan"
+            ? deliveryData.data?.id
+            : null,
+        partners:
+          deliveryData.type === "kurirSendiri"
+            ? deliveryData.data.partners?.map((partner) => ({
+                id: partner?.id,
+                nama: partner?.nama,
+              }))
+            : [],
       }))
     );
 
-    console.log("Payload Before Validation:", payload);
+    console.log("Final Payload:", payload);
 
-    // Validasi Payload
-    const invalidPayload = payload.filter((item) => {
-      if (!item.id_final_stock) {
-        console.warn("Missing id_final_stock:", item);
-        return true;
-      }
-      if (!item.jumlah) {
-        console.warn("Invalid jumlah:", item);
-        return true;
-      }
-      if (!item.id_lokasi && !item.id_pelanggan) {
-        console.warn("Missing id_lokasi and id_pelanggan:", item);
-        return true;
-      }
-      return false;
-    });
-
-    if (invalidPayload.length > 0) {
-      console.log("Invalid Payload Details:", invalidPayload);
-      alert("Beberapa data produk atau tujuan tidak lengkap.");
-      return;
-    }
-
-    console.log("Final Payload to Send:", payload);
-
-    // Kirim ke backend
-    dispatch(submitOutgoingStock(payload))
-      .unwrap()
-      .then(() => {
-        alert("Pengiriman berhasil disimpan!");
-        navigate("/outgoing-label", {
-          state: { selectedProducts, selectedDestination },
-        });
-      })
-      .catch((err) => {
-        console.error("Error during submission:", err);
-        alert("Terjadi kesalahan saat menyimpan data pengiriman.");
+    try {
+      await dispatch(submitOutgoingStock(payload)).unwrap();
+      alert("Pengiriman berhasil disimpan!");
+      navigate("/outgoing-label", {
+        state: {
+          selectedProducts,
+          selectedDestination,
+          deliveryData,
+          payload, // Kirim payload untuk keperluan di halaman berikutnya
+        },
       });
+    } catch (error) {
+      console.error("Error during submission:", error);
+      alert("Terjadi kesalahan saat menyimpan data pengiriman.");
+    }
+  };
+
+  const handleDeliveryOptionSave = (data) => {
+    console.log("Delivery Option Data:", data);
+    setDeliveryData(data);
   };
 
   return (
     <Box sx={{ margin: "0 auto" }}>
       <Grid container spacing={2}>
-        <Grid size={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <ShippingDestination
             selectedDestination={selectedDestination}
             onSelectDestination={(destination) =>
@@ -133,12 +153,8 @@ const OutgoingDetail = () => {
             }
           />
         </Grid>
-        <Grid size={6}>
-          <DeliveryOption
-            onSave={(deliveryData) =>
-              console.log("Delivery Data Saved:", deliveryData)
-            }
-          />
+        <Grid size={{ xs: 12, md: 6 }}>
+          <DeliveryOption onSave={handleDeliveryOptionSave} />
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
@@ -149,7 +165,34 @@ const OutgoingDetail = () => {
       <OutgoingSummaryActions
         onCancel={handleCancel}
         onSubmit={handleSubmit}
-        selectedProducts={selectedProducts}
+        isSubmitDisabled={(() => {
+          const isDisabled =
+            !selectedProducts.length ||
+            !selectedDestination ||
+            !deliveryData ||
+            (deliveryData.type === "kurirSendiri" &&
+              (!deliveryData.data?.driver || !deliveryData.data?.vehicle)) ||
+            (deliveryData.type === "ekspedisiRekanan" &&
+              !deliveryData.data?.id);
+
+          // Debugging untuk setiap kondisi yang menyebabkan tombol disabled
+          console.log("=== Debugging isSubmitDisabled ===");
+          console.log("Selected Products:", selectedProducts.length);
+          console.log("Selected Destination:", selectedDestination);
+          console.log("Delivery Data:", deliveryData);
+          console.log("Delivery Data Type:", deliveryData?.type);
+          if (deliveryData?.type === "kurirSendiri") {
+            console.log("Driver:", deliveryData.data?.driver);
+            console.log("Vehicle:", deliveryData.data?.vehicle);
+          }
+          if (deliveryData?.type === "ekspedisiRekanan") {
+            console.log("Ekspedisi ID:", deliveryData.data?.id);
+          }
+          console.log("Is Submit Disabled:", isDisabled);
+          console.log("==============================");
+
+          return isDisabled;
+        })()}
       />
     </Box>
   );

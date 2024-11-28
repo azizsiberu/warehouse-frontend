@@ -3,13 +3,17 @@
 import React from "react";
 import { Box, Button } from "@mui/material";
 
-const OutgoingLabelActions = ({ onPrint }) => {
+const OutgoingLabelActions = () => {
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
       <Button
         variant="contained"
         color="primary"
-        onClick={onPrint}
+        onClick={handlePrint}
         sx={{ textTransform: "none" }}
       >
         Cetak Label

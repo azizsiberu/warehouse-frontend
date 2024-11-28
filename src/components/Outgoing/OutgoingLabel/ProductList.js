@@ -1,47 +1,26 @@
-//path: src/components/Outgoing/OutgoingLabel/ProductList.js
+// Path: /src/components/Outgoing/OutgoingLabel/ProductList.js
 
 import React from "react";
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-} from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Box, Typography, List, ListItem, Divider } from "@mui/material";
 
 const ProductList = ({ selectedProducts }) => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Produk yang Dikirim
+        Product List
       </Typography>
       <List>
         {selectedProducts.map((product, index) => (
           <React.Fragment key={index}>
             <ListItem>
-              <Grid container>
-                <Grid xs={6}>
-                  <ListItemText
-                    primary={`Nama Produk: ${product.product.nama}`}
-                    secondary={`Jumlah: ${product.variants.reduce(
-                      (sum, variant) => sum + variant.jumlah,
-                      0
-                    )}`}
-                  />
-                </Grid>
-                <Grid xs={6}>
-                  <ListItemText
-                    primary={`Finishing: ${
-                      product.variants[0]?.final_finishing || "-"
-                    }`}
-                    secondary={`Warna: ${
-                      product.variants[0]?.final_warna || "-"
-                    }`}
-                  />
-                </Grid>
-              </Grid>
+              <Typography variant="body2">
+                {product.product.nama} -{" "}
+                {product.variants.reduce(
+                  (sum, variant) => sum + variant.jumlah,
+                  0
+                )}{" "}
+                pcs
+              </Typography>
             </ListItem>
             <Divider />
           </React.Fragment>
