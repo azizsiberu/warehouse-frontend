@@ -29,7 +29,34 @@ const outgoingStockSlice = createSlice({
       state.selectedProducts = action.payload;
     },
     setSelectedDestination(state, action) {
+      console.log(
+        "Dispatch diterima di reducer dengan payload:",
+        action.payload
+      );
+
+      // Validasi payload sebelum menyimpannya
+      if (!action.payload || !action.payload.type) {
+        console.error("Invalid destination payload:", action.payload);
+        return;
+      }
+
+      // Cegah overwrite jika type sudah sama
+      if (
+        state.selectedDestination &&
+        state.selectedDestination.type === action.payload.type &&
+        state.selectedDestination.id === action.payload.id
+      ) {
+        console.log("Payload sama dengan state sebelumnya, tidak diubah.");
+        return;
+      }
+
+      // Perbarui state
       state.selectedDestination = action.payload;
+
+      console.log(
+        "Updated Selected Destination in Redux:",
+        state.selectedDestination
+      );
     },
   },
   extraReducers: (builder) => {

@@ -35,6 +35,10 @@ const OutgoingDetail = () => {
     }
   }, [dispatch, location.state, selectedProducts]);
 
+  useEffect(() => {
+    console.log("Selected Destination di OutgoingDetail:", selectedDestination);
+  }, [selectedDestination]);
+
   const handleCancel = () => navigate(-1);
 
   const handleSubmit = async () => {
@@ -49,25 +53,6 @@ const OutgoingDetail = () => {
     if (!deliveryData) {
       alert("Pilih opsi pengiriman terlebih dahulu.");
       return;
-    }
-
-    if (deliveryData.type === "kurirSendiri") {
-      if (!deliveryData.data?.driver || !deliveryData.data?.driver?.id) {
-        alert("Pilih atau tambahkan driver terlebih dahulu.");
-        return;
-      }
-      if (
-        !deliveryData.data?.vehicle ||
-        !deliveryData.data?.vehicle?.nomor_polisi
-      ) {
-        alert("Pilih atau tambahkan kendaraan terlebih dahulu.");
-        return;
-      }
-    } else if (deliveryData.type === "ekspedisiRekanan") {
-      if (!deliveryData.data?.id) {
-        alert("Pilih atau tambahkan ekspedisi terlebih dahulu.");
-        return;
-      }
     }
 
     if (!selectedProducts || selectedProducts.length === 0) {
@@ -95,9 +80,19 @@ const OutgoingDetail = () => {
           deliveryData.type === "kurirSendiri"
             ? deliveryData.data.driver?.id
             : null,
+        // Kirim data driver lengkap
+        driver:
+          deliveryData.type === "kurirSendiri"
+            ? deliveryData.data.driver
+            : null,
         id_kendaraan:
           deliveryData.type === "kurirSendiri"
             ? deliveryData.data.vehicle?.id
+            : null,
+        // Kirim data kendaraan lengkap
+        vehicle:
+          deliveryData.type === "kurirSendiri"
+            ? deliveryData.data.vehicle
             : null,
         id_ekspedisi:
           deliveryData.type === "ekspedisiRekanan"
@@ -121,9 +116,21 @@ const OutgoingDetail = () => {
       navigate("/outgoing-label", {
         state: {
           selectedProducts,
-          selectedDestination,
-          deliveryData,
-          payload, // Kirim payload untuk keperluan di halaman berikutnya
+          selectedDestination: {
+            ...selectedDestination,
+          },
+          deliveryData: {
+            ...deliveryData,
+            data: {
+              ...deliveryData.data,
+              driver: deliveryData.data.driver || { nama: "Tidak Diketahui" },
+              vehicle: deliveryData.data.vehicle || {
+                nomor_polisi: "Tidak Diketahui",
+              },
+              partners: deliveryData.data.partners || [],
+            },
+          },
+          payload, // Kirim payload untuk kebutuhan di halaman berikutnya
         },
       });
     } catch (error) {

@@ -53,21 +53,18 @@ const ShippingDestination = ({ onSelectDestination, onSelectCustomer }) => {
 
     if (value === "customer") {
       const destination = { type: "pelanggan", id: null };
-      console.log("Selected Destination updated (Customer):", destination);
       onSelectDestination(destination);
+      console.log("Dispatching destination (Customer):", destination);
     } else {
       const destination = { type: "gudang", id: value };
-      console.log("Selected Destination updated (Warehouse):", destination);
       onSelectDestination(destination);
+      console.log("Dispatching destination (Warehouse):", destination);
     }
 
-    // Reset pilihan pelanggan jika tujuan bukan "Pelanggan"
+    // Pastikan tidak memanggil onSelectCustomer jika tipe bukan pelanggan
     if (value !== "customer") {
-      console.log(
-        "Resetting selected customer since destination is not 'Customer'."
-      );
+      console.log("Resetting customer selection (Not a customer).");
       setSelectedCustomer(null);
-      onSelectCustomer(null);
     }
   };
 
@@ -77,8 +74,7 @@ const ShippingDestination = ({ onSelectDestination, onSelectCustomer }) => {
 
     if (newValue) {
       const customerData = { type: "pelanggan", id: newValue.id };
-      console.log("Selected Customer updated:", customerData);
-      onSelectCustomer(newValue);
+      console.log("Dispatching customer selection:", customerData);
       onSelectDestination(customerData);
     }
   };

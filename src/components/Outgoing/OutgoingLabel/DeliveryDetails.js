@@ -2,33 +2,69 @@
 
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 const DeliveryDetails = ({ deliveryData }) => {
+  // Format tanggal dalam bahasa Indonesia
+  const today = format(new Date(), "eeee, dd/MM/yy", { locale: id });
+
   return (
-    <Box>
+    <Box sx={{ mt: 2 }}>
       <Typography variant="h6" gutterBottom>
         Delivery Details
       </Typography>
-      {deliveryData.type === "kurirSendiri" ? (
-        <>
-          <Typography variant="body2">
-            Driver: {deliveryData.data.driver?.nama}
+      <Grid container spacing={2}>
+        {/* Labels */}
+        <Grid size={6}>
+          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+            {deliveryData.type === "kurirSendiri" ? "Driver" : "Ekspedisi"}
           </Typography>
-          <Typography variant="body2">
-            Kendaraan: {deliveryData.data.vehicle?.nomor_polisi}
+          {deliveryData.type === "kurirSendiri" && (
+            <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+              Kendaraan
+            </Typography>
+          )}
+          {deliveryData.type === "kurirSendiri" &&
+            deliveryData.data.partners?.length > 0 && (
+              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                Partner
+              </Typography>
+            )}
+          <Typography variant="body2" sx={{ fontWeight: "bold", mt: 1 }}>
+            Tanggal Dikirim
           </Typography>
-          <Typography variant="body2">Partners:</Typography>
-          <ul>
-            {deliveryData.data.partners?.map((partner, index) => (
-              <li key={index}>{partner.nama}</li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <Typography variant="body2">
-          Ekspedisi: {deliveryData.data?.name || "Tidak diketahui"}
-        </Typography>
-      )}
+        </Grid>
+
+        {/* Values */}
+        <Grid size={6}>
+          <Typography variant="body2">
+            :{" "}
+            {deliveryData.type === "kurirSendiri"
+              ? deliveryData.data.driver?.nama || "-"
+              : deliveryData.data.name || "-"}
+          </Typography>
+          {deliveryData.type === "kurirSendiri" && (
+            <Typography variant="body2">
+              : {deliveryData.data.vehicle?.nomor_polisi || "-"}
+            </Typography>
+          )}
+          {deliveryData.type === "kurirSendiri" &&
+            deliveryData.data.partners?.length > 0 && (
+              <Typography variant="body2">
+                :{" "}
+                {deliveryData.data.partners
+                  .map((partner) => partner.nama)
+                  .join(", ")}
+              </Typography>
+            )}
+          <Typography variant="body2" sx={{ fontWeight: "bold", mt: 1 }}>
+            {" "}
+            : {today}
+          </Typography>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

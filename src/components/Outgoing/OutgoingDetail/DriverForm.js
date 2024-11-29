@@ -30,39 +30,47 @@ const DriverForm = ({ onSave }) => {
   }, [dispatch]);
 
   const handleDriverChange = (event, newValue) => {
+    let updatedDriver = null;
+
     if (newValue && typeof newValue === "object") {
-      // Driver dipilih dari daftar
-      console.log("Driver selected:", newValue);
-      setDriverField(newValue);
-      triggerSave(newValue, partnerFields, vehicleDetails);
-    } else {
-      // Input manual (tanpa ID)
+      console.log("Driver selected from database:", newValue);
+      updatedDriver = newValue;
+    } else if (typeof newValue === "string" && newValue.trim() !== "") {
       console.log("Driver input manually:", newValue);
-      setDriverField({ nama: newValue, id: null });
-      triggerSave({ nama: newValue, id: null }, partnerFields, vehicleDetails);
+      updatedDriver = { nama: newValue.trim(), id: null };
+    }
+
+    setDriverField(updatedDriver || null);
+    triggerSave(updatedDriver, partnerFields, vehicleDetails);
+  };
+
+  // Tambahkan logika untuk menangani input manual driver
+  const handleDriverInputChange = (event, newValue) => {
+    if (typeof newValue === "string") {
+      const updatedDriver = { nama: newValue.trim(), id: null };
+      setDriverField(updatedDriver);
+      triggerSave(updatedDriver, partnerFields, vehicleDetails);
     }
   };
 
   const handlePartnerInputChange = (index, event, newValue) => {
     const updatedPartners = [...partnerFields];
 
-    const partnerName =
-      typeof newValue === "string" ? newValue : newValue?.nama;
-
-    if (partnerName && partnerName.trim() !== "") {
-      if (typeof newValue === "object" && newValue.id) {
-        // Partner dipilih dari daftar (dengan ID)
-        console.log("Partner selected from database:", newValue);
-        updatedPartners[index] = newValue;
-      } else {
-        // Input manual (tanpa ID)
-        console.log("Partner input manually:", partnerName);
-        updatedPartners[index] = { nama: partnerName, id: null };
-      }
+    if (newValue && typeof newValue === "object" && newValue.id) {
+      console.log("Partner selected from database:", newValue);
+      updatedPartners[index] = newValue;
+    } else if (typeof newValue === "string" && newValue.trim() !== "") {
+      console.log("Partner input manually:", newValue);
+      updatedPartners[index] = { nama: newValue.trim(), id: null };
+    } else {
+      updatedPartners[index] = { nama: "", id: null }; // Kosongkan field jika input dihapus
     }
 
-    // Tambahkan field baru jika field terakhir diisi
-    if (index === partnerFields.length - 1 && partnerName?.trim() !== "") {
+    if (
+      index === partnerFields.length - 1 &&
+      updatedPartners[index].nama?.trim() &&
+      !updatedPartners[index + 1]
+    ) {
       updatedPartners.push({ nama: "", id: null });
     }
 
@@ -70,6 +78,27 @@ const DriverForm = ({ onSave }) => {
     triggerSave(driverField, updatedPartners, vehicleDetails);
   };
 
+  // Tambahkan logika untuk menangani input manual partner
+  const handlePartnerInputManual = (index, event, newValue) => {
+    const updatedPartners = [...partnerFields];
+
+    if (typeof newValue === "string" && newValue.trim() !== "") {
+      updatedPartners[index] = { nama: newValue.trim(), id: null };
+    } else {
+      updatedPartners[index] = { nama: "", id: null };
+    }
+
+    // Tambahkan field baru jika field terakhir diisi
+    if (
+      index === updatedPartners.length - 1 &&
+      updatedPartners[index].nama?.trim()
+    ) {
+      updatedPartners.push({ nama: "", id: null });
+    }
+
+    setPartnerFields(updatedPartners);
+    triggerSave(driverField, updatedPartners, vehicleDetails);
+  };
   const handleVehicleDetailsChange = (field, value) => {
     const updatedVehicleDetails = { ...vehicleDetails, [field]: value };
     console.log(`Vehicle detail updated [${field}]:`, value);
@@ -78,11 +107,14 @@ const DriverForm = ({ onSave }) => {
   };
 
   const triggerSave = (driver, partners, vehicle) => {
+    const validDriver = driver?.nama?.trim() ? driver : null;
+    const validPartners = partners.filter((partner) => partner.nama?.trim());
     const data = {
-      driver,
-      partners: partners.filter((partner) => partner.nama?.trim() !== ""),
+      driver: validDriver,
+      partners: validPartners,
       vehicle,
     };
+
     console.log("Triggering save to parent with data:", data);
     onSave(data);
   };
@@ -100,8 +132,9 @@ const DriverForm = ({ onSave }) => {
             options={members || []}
             getOptionLabel={(option) => option.nama || ""}
             loading={loadingGudang}
-            value={driverField} // Driver object
-            onChange={handleDriverChange} // Handle selection
+            value={driverField}
+            onChange={handleDriverChange}
+            onInputChange={handleDriverInputChange} // Tambahkan ini
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -121,10 +154,14 @@ const DriverForm = ({ onSave }) => {
               options={members || []}
               getOptionLabel={(option) => option.nama || ""}
               loading={loadingGudang}
-              value={partner} // Partner object
+              value={partnerFields[index]}
               onChange={(event, newValue) =>
                 handlePartnerInputChange(index, event, newValue)
-              } // Handle selection
+              }
+              onInputChange={
+                (event, newValue) =>
+                  handlePartnerInputManual(index, event, newValue) // Tambahkan ini
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
