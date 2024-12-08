@@ -12,6 +12,9 @@ import ekspedisiRekananReducer from "./reducers/ekspedisiRekananReducer";
 import teamGudangReducer from "./reducers/teamGudangReducer";
 import kendaraanReducer from "./reducers/kendaraanReducer";
 
+import overviewReducer from "./reducers/overviewReducer";
+import stockManagementReducer from "./reducers/stockManagementReducer";
+
 const store = configureStore({
   reducer: {
     products: productReducer,
@@ -25,6 +28,9 @@ const store = configureStore({
     ekspedisiRekanan: ekspedisiRekananReducer,
     teamGudang: teamGudangReducer,
     kendaraan: kendaraanReducer,
+
+    overview: overviewReducer,
+    stockManagement: stockManagementReducer,
   },
 });
 

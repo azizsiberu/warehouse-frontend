@@ -135,6 +135,24 @@ export const getWarehouses = async () => {
   return response.data;
 };
 
+// Fungsi untuk menambahkan lokasi gudang baru
+export const addWarehouse = async (warehouseData) => {
+  const response = await api.post("/api/warehouses", warehouseData);
+  return response.data;
+};
+
+// Fungsi untuk memperbarui lokasi gudang
+export const updateWarehouse = async (id, warehouseData) => {
+  const response = await api.put(`/api/warehouses/${id}`, warehouseData);
+  return response.data;
+};
+
+// Fungsi untuk menghapus lokasi gudang
+export const deleteWarehouse = async (id) => {
+  const response = await api.delete(`/api/warehouses/${id}`);
+  return response.data;
+};
+
 export const submitIncomingStock = async (payload) => {
   const response = await api.post("/api/incoming-stocks", payload);
   return response.data; // Kembalikan data dari API setelah berhasil
@@ -188,6 +206,18 @@ export const createTeamGudangMember = async (memberData) => {
   return response.data; // Mengembalikan data dari API setelah berhasil ditambahkan
 };
 
+// Memperbarui anggota tim gudang
+export const updateTeamGudangMember = async (id, memberData) => {
+  const response = await api.put(`/api/team-gudang/${id}`, memberData);
+  return response.data; // Mengembalikan data setelah diperbarui
+};
+
+// Menonaktifkan anggota tim gudang berdasarkan ID
+export const deactivateTeamGudangMember = async (id) => {
+  const response = await api.delete(`/api/team-gudang/${id}`);
+  return response.data; // Mengembalikan status penonaktifan
+};
+
 export const getKendaraan = async () => {
   const response = await api.get("/api/kendaraan");
   return response.data;
@@ -196,6 +226,18 @@ export const getKendaraan = async () => {
 export const createKendaraan = async (data) => {
   const response = await api.post("/api/kendaraan", data);
   return response.data;
+};
+
+// Memperbarui kendaraan
+export const updateKendaraan = async (id, vehicleData) => {
+  const response = await api.put(`/api/kendaraan/${id}`, vehicleData);
+  return response.data; // Mengembalikan data setelah diperbarui
+};
+
+// Menonaktifkan kendaraan berdasarkan ID
+export const deactivateKendaraan = async (id) => {
+  const response = await api.delete(`/api/kendaraan/${id}`);
+  return response.data; // Mengembalikan status penonaktifan
 };
 
 // Fungsi untuk mendapatkan semua data dari ekspedisi_rekanan
@@ -208,6 +250,86 @@ export const getEkspedisiRekanan = async () => {
 export const createEkspedisiRekanan = async (expeditionData) => {
   const response = await api.post("/api/ekspedisi-rekanan", expeditionData);
   return response.data; // Mengembalikan data dari API setelah berhasil ditambahkan
+};
+
+// Memperbarui ekspedisi rekanan
+export const updateEkspedisiRekanan = async (id, expeditionData) => {
+  const response = await api.put(
+    `/api/ekspedisi-rekanan/${id}`,
+    expeditionData
+  );
+  return response.data; // Mengembalikan data setelah diperbarui
+};
+
+// Menonaktifkan ekspedisi rekanan berdasarkan ID
+export const deactivateEkspedisiRekanan = async (id) => {
+  const response = await api.delete(`/api/ekspedisi-rekanan/${id}`);
+  return response.data; // Mengembalikan status penonaktifan
+};
+
+// Fungsi untuk mendapatkan statistik utama (Main Stats)
+export const getMainStats = async () => {
+  const response = await api.get("/api/stocks/main-stats");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan distribusi stok
+export const getStockDistribution = async () => {
+  const response = await api.get("/api/stocks/distribution");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan tren stok bulan ini
+export const getStockTrend = async () => {
+  const response = await api.get("/api/stocks/trend");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan aktivitas terbaru
+export const getRecentActivities = async () => {
+  const response = await api.get("/api/stocks/recent");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan peringatan stok rendah
+export const getLowStockWarning = async () => {
+  const response = await api.get("/api/stocks/low-stock");
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan riwayat transaksi stok berdasarkan productId dan opsi filter gudang
+export const getStockTransactions = async (productId, warehouseId = null) => {
+  const response = await api.get(`/api/stocks/transactions/${productId}`, {
+    params: warehouseId ? { warehouseId } : {}, // Tambahkan filter gudang jika ada
+  });
+  return response.data;
+};
+
+// Fungsi untuk menambahkan shipping details
+export const addShippingDetails = async (shippingData) => {
+  const response = await api.post("/api/products/shipping", shippingData);
+  return response.data;
+};
+
+// Fungsi untuk mendapatkan shipping details berdasarkan id_produk
+export const getShippingDetailsByProductId = async (id_produk) => {
+  const response = await api.get(`/api/products/shipping/${id_produk}`);
+  return response.data;
+};
+
+// Fungsi untuk memperbarui shipping details
+export const updateShippingDetails = async (id_produk, shippingData) => {
+  const response = await api.put(
+    `/api/products/shipping/${id_produk}`,
+    shippingData
+  );
+  return response.data;
+};
+
+// Fungsi untuk menghapus shipping details
+export const deleteShippingDetails = async (id_produk) => {
+  const response = await api.delete(`/api/products/shipping/${id_produk}`);
+  return response.data;
 };
 
 export default api;

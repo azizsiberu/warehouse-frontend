@@ -3,6 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   getEkspedisiRekanan,
   createEkspedisiRekanan,
+  updateEkspedisiRekanan,
+  deactivateEkspedisiRekanan,
 } from "../../services/api";
 
 const initialState = {
@@ -16,13 +18,13 @@ const ekspedisiRekananSlice = createSlice({
   initialState,
   reducers: {
     setExpeditions: (state, action) => {
-      state.expeditions = action.payload;
+      state.expeditions = action.payload; // Set daftar ekspedisi
     },
     setLoading: (state, action) => {
-      state.loading = action.payload;
+      state.loading = action.payload; // Set status loading
     },
     setError: (state, action) => {
-      state.error = action.payload;
+      state.error = action.payload; // Set error message
     },
   },
 });
@@ -30,29 +32,57 @@ const ekspedisiRekananSlice = createSlice({
 export const { setExpeditions, setLoading, setError } =
   ekspedisiRekananSlice.actions;
 
-// Thunk untuk mendapatkan semua data ekspedisi rekanan
+// **Thunk untuk mendapatkan semua ekspedisi rekanan**
 export const fetchEkspedisiRekanan = () => async (dispatch) => {
   try {
     dispatch(setLoading(true));
     const data = await getEkspedisiRekanan();
-    dispatch(setExpeditions(data));
+    dispatch(setExpeditions(data)); // Simpan ke state Redux
   } catch (error) {
-    dispatch(setError(error.message));
+    dispatch(setError(error.message)); // Tangani error
   } finally {
-    dispatch(setLoading(false));
+    dispatch(setLoading(false)); // Set loading selesai
   }
 };
 
-// Thunk untuk menambahkan data ekspedisi rekanan
-export const addEkspedisiRekanan = (expeditionData) => async (dispatch) => {
+// **Thunk untuk menambahkan ekspedisi rekanan baru**
+export const createNewEkspedisiRekanan =
+  (expeditionData) => async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      await createEkspedisiRekanan(expeditionData); // Panggil API untuk menambah ekspedisi
+      dispatch(fetchEkspedisiRekanan()); // Refresh daftar ekspedisi setelah penambahan
+    } catch (error) {
+      dispatch(setError(error.message)); // Tangani error
+    } finally {
+      dispatch(setLoading(false)); // Set loading selesai
+    }
+  };
+
+// **Thunk untuk memperbarui ekspedisi rekanan**
+export const updateEkspedisiRekananById =
+  (id, expeditionData) => async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      await updateEkspedisiRekanan(id, expeditionData); // Panggil API untuk memperbarui ekspedisi
+      dispatch(fetchEkspedisiRekanan()); // Refresh daftar ekspedisi setelah pembaruan
+    } catch (error) {
+      dispatch(setError(error.message)); // Tangani error
+    } finally {
+      dispatch(setLoading(false)); // Set loading selesai
+    }
+  };
+
+// **Thunk untuk menonaktifkan ekspedisi rekanan**
+export const deactivateEkspedisiRekananById = (id) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    await createEkspedisiRekanan(expeditionData);
-    dispatch(fetchEkspedisiRekanan()); // Refresh data setelah menambahkan ekspedisi
+    await deactivateEkspedisiRekanan(id); // Panggil API untuk menonaktifkan ekspedisi
+    dispatch(fetchEkspedisiRekanan()); // Refresh daftar ekspedisi setelah penonaktifan
   } catch (error) {
-    dispatch(setError(error.message));
+    dispatch(setError(error.message)); // Tangani error
   } finally {
-    dispatch(setLoading(false));
+    dispatch(setLoading(false)); // Set loading selesai
   }
 };
 

@@ -1,10 +1,28 @@
 // path: /src/components/ProductManagement/ProductDetails.js
-import React, { useEffect } from "react";
-import { Box, Typography, Button, Chip, Stack, Divider } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Chip,
+  Stack,
+  Divider,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductById } from "../../redux/reducers/productReducer";
+import {
+  fetchProductById,
+  createShippingDetails,
+  fetchShippingDetailsByProductId,
+  updateShippingDetailsByProductId,
+} from "../../redux/reducers/productReducer";
 import Loading from "../Loading";
 
 const ProductDetails = ({ setPageTitle }) => {
@@ -12,17 +30,24 @@ const ProductDetails = ({ setPageTitle }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { productDetails, loading, error } = useSelector(
+  // State untuk dialog dan keterangan tambahan
+  const [openDialog, setOpenDialog] = useState(false);
+  const [additionalInfo, setAdditionalInfo] = useState({
+    packing_panjang: "",
+    packing_lebar: "",
+    packing_tinggi: "",
+    berat_barang: "",
+    jumlah_coli: "",
+  });
+
+  const { productDetails, loading, error, shippingDetails } = useSelector(
     (state) => state.products
   );
 
   useEffect(() => {
-    dispatch(fetchProductById(id)); // Memanggil thunk untuk mendapatkan detail produk berdasarkan id_produk
+    dispatch(fetchProductById(id));
+    dispatch(fetchShippingDetailsByProductId(id));
   }, [dispatch, id]);
-
-  const handleEditProduct = () => {
-    navigate(`/product-management/edit/${id}`); // Mengarahkan ke halaman edit produk
-  };
 
   // Update the page title when product details are available
   useEffect(() => {
@@ -44,6 +69,46 @@ const ProductDetails = ({ setPageTitle }) => {
   if (!productDetails) {
     return <Typography variant="h6">Produk tidak ditemukan</Typography>;
   }
+
+  const handleOpenDialog = () => {
+    if (shippingDetails && shippingDetails.packing_panjang) {
+      setAdditionalInfo({
+        packing_panjang: shippingDetails.packing_panjang || "",
+        packing_lebar: shippingDetails.packing_lebar || "",
+        packing_tinggi: shippingDetails.packing_tinggi || "",
+        berat_barang: shippingDetails.berat_barang || "",
+        jumlah_coli: shippingDetails.jumlah_coli || "",
+      });
+    } else {
+      // Reset jika tidak ada data shipping
+      setAdditionalInfo({
+        packing_panjang: "",
+        packing_lebar: "",
+        packing_tinggi: "",
+        berat_barang: "",
+        jumlah_coli: "",
+      });
+    }
+    setOpenDialog(true);
+  };
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  // Fungsi untuk menangani perubahan input
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setAdditionalInfo({ ...additionalInfo, [name]: value });
+  };
+
+  const handleSaveShippingDetails = () => {
+    if (shippingDetails && shippingDetails.packing_panjang) {
+      // Jika data shipping sudah ada, panggil updateShippingDetailsByProductId
+      dispatch(updateShippingDetailsByProductId(id, additionalInfo));
+    } else {
+      // Jika data shipping belum ada, panggil createShippingDetails
+      dispatch(createShippingDetails({ id_produk: id, ...additionalInfo }));
+    }
+    handleCloseDialog();
+  };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -211,17 +276,155 @@ const ProductDetails = ({ setPageTitle }) => {
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 3 }}>
+          {productDetails && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6">Detail Pengiriman</Typography>
+              {shippingDetails && shippingDetails.packing_panjang ? (
+                <Box>
+                  <Divider sx={{ mb: 2 }} />
+
+                  <Grid container spacing={2}>
+                    <Grid size={6}>
+                      <Typography variant="body1" gutterBottom>
+                        Dimensi Packing
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        Berat Barang
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        Jumlah Coli
+                      </Typography>
+                    </Grid>
+                    <Grid size={6}>
+                      <Typography variant="body1" gutterBottom>
+                        : {shippingDetails.packing_panjang} x{" "}
+                        {shippingDetails.packing_lebar} x{" "}
+                        {shippingDetails.packing_tinggi} cm
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        : {shippingDetails.berat_barang} kg
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        : {shippingDetails.jumlah_coli}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+              ) : (
+                <Typography variant="body1" color="text.secondary">
+                  Data pengiriman belum tersedia.
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          <Box sx={{ mt: 2 }}>
             <Button
               variant="contained"
               color="primary"
-              onClick={handleEditProduct}
+              onClick={handleOpenDialog}
             >
-              Edit Produk
+              {shippingDetails && shippingDetails.packing_panjang
+                ? "Edit Detail Pengiriman"
+                : "Tambahkan Detail Pengiriman"}
             </Button>
           </Box>
         </Grid>
       </Grid>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle> Keterangan Pengiriman</DialogTitle>
+        <DialogContent>
+          <Typography variant="subtitle1">Dimensi Packing</Typography>
+          <Grid container spacing={2}>
+            <Grid size={4}>
+              <TextField
+                label="Panjang (cm)"
+                name="packing_panjang"
+                type="text"
+                value={additionalInfo.packing_panjang}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    handleInputChange(e);
+                  }
+                }}
+                fullWidth
+                margin="normal"
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                label="Lebar (cm)"
+                name="packing_lebar"
+                type="text"
+                value={additionalInfo.packing_lebar}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    handleInputChange(e);
+                  }
+                }}
+                fullWidth
+                margin="normal"
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                label="Tinggi (cm)"
+                name="packing_tinggi"
+                type="text"
+                value={additionalInfo.packing_tinggi}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) {
+                    handleInputChange(e);
+                  }
+                }}
+                fullWidth
+                margin="normal"
+              />
+            </Grid>
+          </Grid>
+          <TextField
+            label="Berat Barang (kg)"
+            name="berat_barang"
+            type="text"
+            value={additionalInfo.berat_barang}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*\.?\d*$/.test(value)) {
+                handleInputChange(e);
+              }
+            }}
+            fullWidth
+            margin="normal"
+          />
+
+          <TextField
+            label="Jumlah Coli"
+            name="jumlah_coli"
+            type="text"
+            value={additionalInfo.jumlah_coli}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                handleInputChange(e);
+              }
+            }}
+            fullWidth
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Batal
+          </Button>
+          <Button onClick={handleSaveShippingDetails} color="primary">
+            Simpan
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

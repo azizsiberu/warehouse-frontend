@@ -11,6 +11,9 @@ import Register from "../components/auth/Register";
 import VerifyCode from "../components/auth/VerifyCode";
 import ResetPassword from "../components/auth/ResetPassword";
 import DashboardView from "../views/DashboardView";
+import OverviewView from "../views/OverviewView";
+import StockManagementView from "../views/StockManagementView";
+import OperationalView from "../views/OperationalView";
 import ProductManagementView from "../views/ProductManagementView";
 import ProductDetails from "../components/ProductManagement/ProductDetails";
 import ReceivingManagementView from "../views/ReceivingStock";
@@ -84,11 +87,21 @@ const AppRoutes = () => {
               element={<DashboardView setPageTitle={updateDocumentTitle} />}
             />
             <Route
+              path="/overview"
+              element={<OverviewView setPageTitle={updateDocumentTitle} />}
+            />
+            <Route
+              path="/operational"
+              element={<OperationalView setPageTitle={updateDocumentTitle} />}
+            />
+
+            <Route
               path="/product-management"
               element={
                 <ProductManagementView setPageTitle={updateDocumentTitle} />
               }
             />
+
             <Route
               path="/product/:id/:slug"
               element={<ProductDetails setPageTitle={updateDocumentTitle} />}
@@ -122,6 +135,12 @@ const AppRoutes = () => {
             <Route
               path="/outgoing-label"
               element={<OutgoingLabelView setPageTitle={updateDocumentTitle} />}
+            />
+            <Route
+              path="/inventory-management"
+              element={
+                <StockManagementView setPageTitle={updateDocumentTitle} />
+              }
             />
             {/* Tambahkan rute lainnya yang dilindungi di sini */}
           </Route>

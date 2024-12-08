@@ -1,6 +1,11 @@
 // path: /src/redux/reducers/kendaraanReducer.js
 import { createSlice } from "@reduxjs/toolkit";
-import { getKendaraan, createKendaraan } from "../../services/api";
+import {
+  getKendaraan,
+  createKendaraan,
+  updateKendaraan,
+  deactivateKendaraan,
+} from "../../services/api";
 
 const initialState = {
   kendaraan: [], // Daftar kendaraan
@@ -49,6 +54,32 @@ export const createNewKendaraan = (kendaraanData) => async (dispatch) => {
   try {
     const newKendaraan = await createKendaraan(kendaraanData); // Panggil API untuk menambah kendaraan
     dispatch(addKendaraanToList(newKendaraan)); // Tambahkan ke state Redux
+  } catch (error) {
+    dispatch(setError(error.message)); // Tangani error
+  } finally {
+    dispatch(setLoading(false)); // Set loading selesai
+  }
+};
+
+// **Thunk untuk memperbarui kendaraan**
+export const updateKendaraanById = (id, kendaraanData) => async (dispatch) => {
+  dispatch(setLoading(true));
+  try {
+    await updateKendaraan(id, kendaraanData); // Panggil API untuk memperbarui kendaraan
+    dispatch(fetchKendaraan()); // Refresh daftar kendaraan setelah pembaruan
+  } catch (error) {
+    dispatch(setError(error.message)); // Tangani error
+  } finally {
+    dispatch(setLoading(false)); // Set loading selesai
+  }
+};
+
+// **Thunk untuk menonaktifkan kendaraan**
+export const deactivateKendaraanById = (id) => async (dispatch) => {
+  dispatch(setLoading(true));
+  try {
+    await deactivateKendaraan(id); // Panggil API untuk menonaktifkan kendaraan
+    dispatch(fetchKendaraan()); // Refresh daftar kendaraan setelah penonaktifan
   } catch (error) {
     dispatch(setError(error.message)); // Tangani error
   } finally {

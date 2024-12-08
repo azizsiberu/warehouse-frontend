@@ -10,10 +10,10 @@ import {
 } from "react-icons/md";
 
 const menuItems = [
-  { icon: MdInsights, label: "Dashboard", route: "/dashboard" }, // Ringkasan Kinerja, Grafik dan Laporan
+  { icon: MdInsights, label: "Ringkasan", route: "/overview" }, // Ringkasan Kinerja, Grafik dan Laporan
   {
     icon: MdMoveUp,
-    label: "Manajemen Produk",
+    label: "Daftar Produk",
     route: "/product-management",
   }, // Daftar Produk, Tambah/Edit Produk, Kategori Produk
   {
@@ -27,13 +27,13 @@ const menuItems = [
     label: "Manajemen Stok",
     route: "/inventory-management",
   }, // Cek Stok, Pemindahan Stok, Peringatan Stok Rendah
-  { icon: MdInsights, label: "Laporan dan Analisis", route: "/reports" }, // Laporan Bulanan, Laporan Kustom
+  // { icon: MdInsights, label: "Laporan dan Analisis", route: "/reports" }, // Laporan Bulanan, Laporan Kustom
   {
     icon: MdOutlineSupportAgent,
-    label: "Bantuan dan Dukungan",
-    route: "/support",
+    label: "Operasional",
+    route: "/operational",
   }, // Panduan Penggunaan, Kontak Dukungan
-  { icon: MdRestore, label: "Log Aktivitas", route: "/activity-log" }, // Riwayat Aktivitas
+  // { icon: MdRestore, label: "Log Aktivitas", route: "/activity-log" }, // Riwayat Aktivitas
 ];
 
 export default menuItems;

@@ -1,10 +1,23 @@
 // path: /src/redux/reducers/productReducer.js
 import { createSlice } from "@reduxjs/toolkit";
-import { getProductById, updateProduct, getKainAttributes, getKakiAttributes, getDudukanAttributes, getWarnaByKainId, getFinishingAttributes } from "../../services/api"; // Impor API
+import {
+  getProductById,
+  updateProduct,
+  getKainAttributes,
+  getKakiAttributes,
+  getDudukanAttributes,
+  getWarnaByKainId,
+  getFinishingAttributes,
+  addShippingDetails,
+  getShippingDetailsByProductId,
+  updateShippingDetails,
+  deleteShippingDetails,
+} from "../../services/api"; // Impor API
 
 const initialState = {
   products: [], // Untuk menyimpan daftar produk
   productDetails: null, // Untuk menyimpan detail produk
+  shippingDetails: null, // Untuk menyimpan shipping details
   kainAttributes: [], // Untuk menyimpan data kain
   kakiAttributes: [], // Untuk menyimpan data kaki
   dudukanAttributes: [], // Untuk menyimpan data dudukan
@@ -63,7 +76,18 @@ const productSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
-    
+    setProductDetails: (state, action) => {
+      state.productDetails = action.payload;
+    },
+    setShippingDetails: (state, action) => {
+      state.shippingDetails = action.payload;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
   },
 });
 
@@ -74,10 +98,12 @@ export const {
   setKainAttributes,
   setKakiAttributes,
   setDudukanAttributes,
-   setWarnaOptions, setFinishingOptions,
-     setLoading,
+  setWarnaOptions,
+  setFinishingOptions,
+  setLoading,
   setError,
   setProductDetails,
+  setShippingDetails,
 } = productSlice.actions;
 
 // Thunk untuk mendapatkan detail produk dari API
@@ -174,5 +200,65 @@ export const fetchFinishingAttributes = () => async (dispatch) => {
     dispatch(setLoading(false)); // Matikan loading state
   }
 };
+
+// Thunk untuk menambahkan shipping details
+export const createShippingDetails = (shippingData) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+    const result = await addShippingDetails(shippingData);
+    dispatch(setShippingDetails(result));
+  } catch (error) {
+    dispatch(setError(error.message));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+// Thunk untuk mendapatkan shipping details berdasarkan id_produk
+export const fetchShippingDetailsByProductId =
+  (id_produk) => async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      const result = await getShippingDetailsByProductId(id_produk);
+      if (result) {
+        dispatch(setShippingDetails(result));
+      } else {
+        dispatch(setShippingDetails(null)); // Set ke null jika tidak ada data
+      }
+    } catch (error) {
+      dispatch(setError(error.message));
+      dispatch(setShippingDetails(null)); // Set ke null jika terjadi error
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Thunk untuk memperbarui shipping details
+export const updateShippingDetailsByProductId =
+  (id_produk, shippingData) => async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      const result = await updateShippingDetails(id_produk, shippingData);
+      dispatch(setShippingDetails(result));
+    } catch (error) {
+      dispatch(setError(error.message));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+// Thunk untuk menghapus shipping details
+export const deleteShippingDetailsByProductId =
+  (id_produk) => async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      await deleteShippingDetails(id_produk);
+      dispatch(setShippingDetails(null));
+    } catch (error) {
+      dispatch(setError(error.message));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
 export default productSlice.reducer;
