@@ -23,6 +23,8 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isPhoneValid, setIsPhoneValid] = useState(true);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,11 +36,37 @@ const Register = () => {
       alert("Password dan konfirmasi password tidak cocok.");
       return;
     }
+    if (!isEmailValid || !isPhoneValid) {
+      alert("Format email atau nomor HP tidak sesuai.");
+      return;
+    }
     dispatch(register({ fullName, email, phone, password })).then((result) => {
       if (!result.error) {
         navigate("/login");
       }
     });
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[0-9]+$/;
+    return phoneRegex.test(phone);
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    setIsEmailValid(validateEmail(value));
+  };
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    setPhone(value);
+    setIsPhoneValid(validatePhone(value));
   };
 
   return (
@@ -103,7 +131,9 @@ const Register = () => {
                 variant="outlined"
                 fullWidth
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
+                error={!isEmailValid}
+                helperText={!isEmailValid && "Format email tidak sesuai"}
               />
             </Grid>
             <TextField
@@ -111,7 +141,14 @@ const Register = () => {
               variant="outlined"
               fullWidth
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={handlePhoneChange}
+              onKeyPress={(e) => {
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+              error={!isPhoneValid}
+              helperText={!isPhoneValid && "Nomor HP hanya boleh berisi angka"}
             />
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField

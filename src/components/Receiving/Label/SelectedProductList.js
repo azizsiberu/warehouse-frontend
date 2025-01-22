@@ -20,11 +20,10 @@ const SelectedProductList = ({ selectedProducts, showImage = true }) => {
       <Grid container spacing={2}>
         {selectedProducts?.map((productData, index) => (
           <Grid
-            size={{ xs: 12, sm: 6 }}
+            size={{ xs: 12 }}
             key={index}
             sx={{
               "@media print": {
-                width: "45%", // Mengatur dua item per baris pada mode print
                 pageBreakInside: "avoid", // Menghindari pemotongan produk di tengah halaman
                 padding: "10px",
                 boxSizing: "border-box",

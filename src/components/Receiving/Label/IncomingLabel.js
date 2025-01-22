@@ -1,36 +1,40 @@
 // path: /src/components/Receiving/Label/IncomingStockLabel.js
 import React, { useRef } from "react";
-import { Box, Typography, Chip, Divider, Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import SelectedProductList from "./SelectedProductList";
 
 const IncomingLabel = ({ selectedProducts, selectedLocation }) => {
-  const printRef = useRef(); // Reference untuk bagian yang akan dicetak
+  const printRef = useRef();
 
   const handlePrint = () => {
-    const printContent = printRef.current; // Referensi ke elemen yang ingin dicetak
-    const originalContent = document.body.innerHTML; // Simpan konten asli dari halaman
+    const printContent = printRef.current;
+    const originalContent = document.body.innerHTML;
 
-    // Mengganti body HTML dengan hanya konten yang ingin dicetak
     document.body.innerHTML = printContent.innerHTML;
-
-    window.print(); // Memulai proses print
-
-    // Mengembalikan konten asli setelah proses print selesai
+    window.print();
     document.body.innerHTML = originalContent;
-
-    // Reload halaman agar skrip dan state kembali seperti semula
     window.location.reload();
   };
 
   return (
     <Box>
-      {/* Menampilkan daftar produk yang dipilih */}
       <Box ref={printRef} id="printableArea">
-        <SelectedProductList
-          selectedProducts={selectedProducts}
-          showImage={false}
-        />
+        <Grid container spacing={2}>
+          {selectedProducts?.map((productData, index) => {
+            const jumlah = productData.jumlah || 1;
+            return Array.from({ length: jumlah }).map((_, i) => (
+              <Grid size={{ xs: 12, sm: 6 }} key={`${index}-${i}`}>
+                <SelectedProductList
+                  selectedProducts={[productData]}
+                  showImage={false}
+                />
+              </Grid>
+            ));
+          })}
+        </Grid>
       </Box>
+
       <Box
         sx={{
           textAlign: "center",

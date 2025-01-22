@@ -200,6 +200,12 @@ const KayuForm = ({
         m={0}
         sx={{ border: "1px solid #ccc", borderRadius: 2, mt: 1 }}
       >
+        <Typography
+          variant="subtitle1"
+          sx={{ fontSize: "14px", fontWeight: "bold" }}
+        >
+          Produk Custom?
+        </Typography>
         <Grid container spacing={1}>
           <Grid size={6}>
             <Typography variant="subtitle1" sx={{ fontSize: "14px", mt: 1 }}>

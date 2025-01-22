@@ -133,7 +133,7 @@ const SummaryActions = ({ onCancel, selectedProducts, selectedLocation }) => {
             onClick={handleSubmit}
             startIcon={<MdSend />}
           >
-            Kirim
+            Simpan{" "}
           </Button>
         </Grid>
       </Grid>
