@@ -188,6 +188,17 @@ const SelectedProductList = ({ selectedProducts }) => {
                     </Grid>
                   </Grid>
                 ))}
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    Status Produk :{productData.productStatus}{" "}
+                  </Typography>
+                  <Typography variant="subtitle2">
+                    {productData.detail}
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    Sudah Komplit? :{productData.isComplete}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Grid>

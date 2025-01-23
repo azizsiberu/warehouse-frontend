@@ -7,6 +7,11 @@ import {
   Button,
   TextField,
   IconButton,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import SofaForm from "./Forms/SofaForm";
@@ -20,6 +25,9 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
   const [quantity, setQuantity] = useState(1);
   const [finishingVisible, setFinishingVisible] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+  const [isComplete, setIsComplete] = useState("");
+  const [productStatus, setProductStatus] = useState("");
+  const [detail, setDetail] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -53,6 +61,18 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
     }
   };
 
+  const handleRadioChange = (event) => {
+    setIsComplete(event.target.value);
+  };
+
+  const handleProductStatusChange = (event) => {
+    setProductStatus(event.target.value);
+  };
+
+  const handleDetailChange = (event) => {
+    setDetail(event.target.value);
+  };
+
   const handleClose = () => {
     setFormData({}); // Reset form data
     setQuantity(1); // Reset quantity
@@ -68,6 +88,9 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
       id_produk: product.id_produk,
       ...formData,
       jumlah: quantity,
+      isComplete,
+      productStatus,
+      detail,
     };
 
     console.log("Data from NewStockModal to ReceivingList:", submissionData); // Log data ke console
@@ -257,6 +280,62 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
             {renderForm()}
           </Box>
         </Box>{" "}
+        <Box>
+          <FormControl component="fieldset">
+            <Typography variant="body2" gutterBottom>
+              Apakah Komplit?
+            </Typography>
+            <RadioGroup row value={isComplete} onChange={handleRadioChange}>
+              <FormControlLabel value="Ya" control={<Radio />} label="Ya" />
+              <FormControlLabel
+                value="Tidak"
+                control={<Radio />}
+                label="Tidak"
+              />
+            </RadioGroup>
+          </FormControl>
+          {isComplete === "Tidak" && (
+            <TextField
+              size="small"
+              label="Apa yang kurang?"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              onChange={handleDetailChange}
+            />
+          )}
+          <FormControl component="fieldset" mt={2}>
+            <Typography variant="body2" gutterBottom>
+              Apakah produk ini merupakan stok atau sudah dipesan?
+            </Typography>
+            <RadioGroup
+              row
+              value={productStatus}
+              onChange={handleProductStatusChange}
+            >
+              <FormControlLabel value="Stok" control={<Radio />} label="Stok" />
+              <FormControlLabel
+                value="Sudah Dipesan"
+                control={<Radio />}
+                label="Sudah Dipesan"
+              />
+            </RadioGroup>
+          </FormControl>
+          {(productStatus === "Stok" || productStatus === "Sudah Dipesan") && (
+            <TextField
+              size="small"
+              label={
+                productStatus === "Stok"
+                  ? "Silakan tulis detail stok"
+                  : "Silakan tulis detail pesanan"
+              }
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              onChange={handleDetailChange}
+            />
+          )}
+        </Box>
         <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
           <Button variant="outlined" onClick={handleClose}>
             Batal
