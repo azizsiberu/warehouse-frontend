@@ -1,28 +1,52 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.env
+# MacOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Log files
+logs
+*.log
+*.log.*
+
+# Build output
+build/
+dist/
+
+# Testing
+coverage/
+*.lcov
+
+# Environment variables
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules
+# Temp files
+*.tmp
+*.swp
+*.swpx
+*.swo
 
-# Sentry Config File
-.sentryclirc
+# Others
+*.lock
+.eslintcache
+.cache/
+
+# Ignore service worker output
+service-worker.js
