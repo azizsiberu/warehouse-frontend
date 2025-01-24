@@ -196,7 +196,8 @@ const SelectedProductList = ({ selectedProducts }) => {
                     {productData.detail}
                   </Typography>
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                    Sudah Komplit? :{productData.isComplete}
+                    Sudah Komplit? :{productData.isComplete}{" "}
+                    {productData.incompleteDetail}
                   </Typography>
                 </Box>
               </Box>

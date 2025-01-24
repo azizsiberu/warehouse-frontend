@@ -57,7 +57,8 @@ const SelectedProductList = ({ selectedProducts, showImage = true }) => {
                   </Grid>
                   <Grid size={8}>
                     <Typography variant="subtitle2">
-                      : ___________________________
+                      :{" "}
+                      {productData.detail ? productData.detail : "___________"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -199,6 +200,25 @@ const SelectedProductList = ({ selectedProducts, showImage = true }) => {
                     </Grid>
                   </Grid>
                 ))}
+                <Box>
+                  <Grid container>
+                    <Grid size={6}>
+                      <Typography variant="subtitle2">Status Produk</Typography>
+                      <Typography variant="subtitle2">Kelengkapan</Typography>
+                    </Grid>
+                    <Grid size={6}>
+                      <Typography variant="subtitle2">
+                        : {productData.productStatus}
+                      </Typography>
+                      <Typography variant="subtitle2">
+                        : {productData.isComplete}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Typography variant="subtitle2">
+                    {productData.incompleteDetail}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Grid>

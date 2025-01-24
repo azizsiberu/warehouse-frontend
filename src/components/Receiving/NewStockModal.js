@@ -26,6 +26,7 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
   const [finishingVisible, setFinishingVisible] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [isComplete, setIsComplete] = useState("");
+  const [incompleteDetail, setIncompleteDetail] = useState("");
   const [productStatus, setProductStatus] = useState("");
   const [detail, setDetail] = useState("");
 
@@ -64,6 +65,9 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
   const handleRadioChange = (event) => {
     setIsComplete(event.target.value);
   };
+  const handleIncompleteDetailChange = (event) => {
+    setIncompleteDetail(event.target.value);
+  };
 
   const handleProductStatusChange = (event) => {
     setProductStatus(event.target.value);
@@ -91,6 +95,7 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
       isComplete,
       productStatus,
       detail,
+      incompleteDetail,
     };
 
     console.log("Data from NewStockModal to ReceivingList:", submissionData); // Log data ke console
@@ -301,7 +306,8 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
               variant="outlined"
               fullWidth
               margin="normal"
-              onChange={handleDetailChange}
+              onChange={handleIncompleteDetailChange}
+              value={incompleteDetail}
             />
           )}
           <FormControl component="fieldset" mt={2}>

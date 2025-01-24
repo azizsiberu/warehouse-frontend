@@ -56,6 +56,10 @@ const SummaryActions = ({ onCancel, selectedProducts, selectedLocation }) => {
         bantal_peluk: null,
         bantal_sandaran: null,
         kantong_remot: null,
+        isComplete: product.isComplete, // Menambahkan field baru
+        incompleteDetail: product.incompleteDetail, // Menambahkan field baru
+        productStatus: product.productStatus, // Menambahkan field baru
+        detail: product.detail, // Menambahkan field baru
       };
 
       // Loop untuk memasukkan additionalOptions ke kolom kustom
