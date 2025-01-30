@@ -1,6 +1,8 @@
 // path: src/components/ScheduleManagement/TableTemporary.js
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import { fetchSchedules } from "../../redux/reducers/scheduleReducer"; // Import action fetchSchedules
 import {
   Table,
@@ -24,8 +26,14 @@ const TableTemporary = () => {
     dispatch(fetchSchedules()); // Memanggil fetchSchedules saat komponen dimount
   }, [dispatch]);
 
+  const navigate = useNavigate();
+
   const [selected, setSelected] = React.useState([]);
   const [searchTerm, setSearchTerm] = React.useState(""); // State for storing the search term
+
+  const handleRowClick = (scheduleId) => {
+    navigate(`/schedule/${scheduleId}`);
+  };
 
   const handleSelect = (scheduleId) => {
     setSelected((prev) =>
@@ -38,7 +46,7 @@ const TableTemporary = () => {
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "2-digit" };
     const date = new Date(dateString);
-    return date.toLocaleDateString("id-ID", options); // Menggunakan 'id-ID' untuk format tanggal Indonesia
+    return date.toLocaleDateString("id-ID", options);
   };
 
   // Filter data based on search term
@@ -71,7 +79,7 @@ const TableTemporary = () => {
           label="Cari Nama Pelanggan"
           variant="outlined"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)} // Update search term
+          onChange={(e) => setSearchTerm(e.target.value)}
           sx={{
             bgcolor: "white",
             borderRadius: 1,
@@ -95,7 +103,14 @@ const TableTemporary = () => {
           </TableHead>
           <TableBody>
             {filteredData.map((schedule) => (
-              <TableRow key={schedule.transaction_id}>
+              <TableRow
+                key={schedule.transaction_id}
+                onClick={() => handleRowClick(schedule.transaction_id)}
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": { backgroundColor: "grey.100" },
+                }}
+              >
                 <TableCell>{schedule.sales_name}</TableCell>
                 <TableCell>{schedule.nama_pelanggan}</TableCell>
                 <TableCell>{formatDate(schedule.tanggal_pengiriman)}</TableCell>

@@ -58,23 +58,17 @@ const scheduleSlice = createSlice({
       .addCase(fetchScheduleById.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log("Fetching schedule by ID... Pending state"); // Debug log untuk status pending
+        console.log("Fetching schedule by ID... Pending state");
       })
       .addCase(fetchScheduleById.fulfilled, (state, action) => {
         state.currentSchedule = action.payload;
         state.loading = false;
-        console.log(
-          "Fetching schedule by ID successful. Data:",
-          action.payload
-        ); // Debug log untuk data yang diterima berdasarkan ID
+        console.log("Fetched schedule by ID successfully:", action.payload);
       })
       .addCase(fetchScheduleById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-        console.error(
-          "Fetching schedule by ID failed. Error:",
-          action.error.message
-        ); // Debug log untuk error
+        console.error("Failed to fetch schedule by ID:", action.error.message);
       });
   },
 });

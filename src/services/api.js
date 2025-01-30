@@ -340,8 +340,15 @@ export const getSchedules = async () => {
 
 // Fungsi untuk mendapatkan jadwal sementara berdasarkan ID
 export const getScheduleById = async (id) => {
-  const response = await api.get(`/api/schedules/${id}`);
-  return response.data; // Mengembalikan data jadwal sementara berdasarkan ID
+  try {
+    console.log(`Fetching schedule with ID: ${id}`);
+    const response = await api.get(`/api/schedules/${id}`);
+    console.log("Fetched schedule details:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedule by ID:", error);
+    throw error;
+  }
 };
 
 export default api;

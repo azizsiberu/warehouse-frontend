@@ -23,6 +23,7 @@ import OutgoingStockView from "../views/OutgoingStockView";
 import OutgoingDetailView from "../views/OutgoingDetailView";
 import OutgoingLabelView from "../views/OutgoingLabelView";
 import ScheduleManagementView from "../views/ScheduleManagementView";
+import ScheduleDetailView from "../views/ScheduleDetailView";
 import { clearAuth } from "../redux/reducers/authReducer";
 
 const APP_NAME = "Ajeg Gudang"; // Define your application name here
@@ -95,14 +96,12 @@ const AppRoutes = () => {
               path="/operational"
               element={<OperationalView setPageTitle={updateDocumentTitle} />}
             />
-
             <Route
               path="/product-management"
               element={
                 <ProductManagementView setPageTitle={updateDocumentTitle} />
               }
             />
-
             <Route
               path="/product/:id/:slug"
               element={<ProductDetails setPageTitle={updateDocumentTitle} />}
@@ -144,11 +143,18 @@ const AppRoutes = () => {
               }
             />
             <Route
-              path="/schedule-management"
+              path="/schedule"
               element={
                 <ScheduleManagementView setPageTitle={updateDocumentTitle} />
               }
             />
+            <Route
+              path="/schedule/:id"
+              element={
+                <ScheduleDetailView setPageTitle={updateDocumentTitle} />
+              }
+            />{" "}
+            {/* Route untuk detail jadwal */}
             {/* Tambahkan rute lainnya yang dilindungi di sini */}
           </Route>
         </Routes>

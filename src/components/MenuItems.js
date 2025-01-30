@@ -31,7 +31,7 @@ const menuItems = [
   {
     icon: MdCalendarMonth,
     label: "Jadwal Pengiriman",
-    route: "/schedule-management",
+    route: "/schedule",
   },
   // { icon: MdInsights, label: "Laporan dan Analisis", route: "/reports" }, // Laporan Bulanan, Laporan Kustom
   {
