@@ -19,6 +19,10 @@ const StockManagementView = ({ setPageTitle }) => {
   const [filteredStocks, setFilteredStocks] = useState([]);
 
   useEffect(() => {
+    const title = "Manajemen Stok";
+    setPageTitle(title);
+    document.title = title;
+
     dispatch(fetchFinalStocks());
     dispatch(fetchWarehouses());
   }, [dispatch]);

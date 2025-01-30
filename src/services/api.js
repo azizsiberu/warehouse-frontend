@@ -332,4 +332,16 @@ export const deleteShippingDetails = async (id_produk) => {
   return response.data;
 };
 
+// Fungsi untuk mendapatkan semua jadwal sementara
+export const getSchedules = async () => {
+  const response = await api.get("/api/schedules");
+  return response.data; // Mengembalikan data jadwal sementara dari API
+};
+
+// Fungsi untuk mendapatkan jadwal sementara berdasarkan ID
+export const getScheduleById = async (id) => {
+  const response = await api.get(`/api/schedules/${id}`);
+  return response.data; // Mengembalikan data jadwal sementara berdasarkan ID
+};
+
 export default api;

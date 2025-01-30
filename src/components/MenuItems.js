@@ -7,6 +7,7 @@ import {
   MdAppsOutage,
   MdRestore,
   MdOutlineSupportAgent,
+  MdCalendarMonth,
 } from "react-icons/md";
 
 const menuItems = [
@@ -27,6 +28,11 @@ const menuItems = [
     label: "Manajemen Stok",
     route: "/inventory-management",
   }, // Cek Stok, Pemindahan Stok, Peringatan Stok Rendah
+  {
+    icon: MdCalendarMonth,
+    label: "Jadwal Pengiriman",
+    route: "/schedule-management",
+  },
   // { icon: MdInsights, label: "Laporan dan Analisis", route: "/reports" }, // Laporan Bulanan, Laporan Kustom
   {
     icon: MdOutlineSupportAgent,

@@ -299,7 +299,7 @@ const SofaForm = ({
     <Box sx={{ maxHeight: 350, overflowY: "scroll" }}>
       <Grid container spacing={1}>
         {/* Spesifikasi Produk */}
-        <Grid item size={12}>
+        <Grid item size={6}>
           <Grid container spacing={1}>
             <Grid item size={6}>
               <Typography variant="body2" gutterBottom>
@@ -343,6 +343,8 @@ const SofaForm = ({
               )}
             </Grid>
           </Grid>
+        </Grid>
+        <Grid item size={6}>
           <Grid container spacing={1}>
             <Grid item size={6}>
               {productDetails?.bantal_peluk && (

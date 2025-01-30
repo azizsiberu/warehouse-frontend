@@ -285,7 +285,7 @@ const KomplimenForm = ({
   return (
     <Box sx={{ maxHeight: 350, overflowY: "scroll" }}>
       <Grid container spacing={1}>
-        <Grid item size={12}>
+        <Grid item size={6}>
           <Grid container spacing={1}>
             <Grid item size={6}>
               <Typography variant="body2" gutterBottom>
@@ -299,21 +299,6 @@ const KomplimenForm = ({
               {productDetails?.kaki && (
                 <Typography variant="body2" gutterBottom>
                   Jenis Kaki
-                </Typography>
-              )}
-              {productDetails?.dudukan && (
-                <Typography variant="body2" gutterBottom>
-                  Dudukan
-                </Typography>
-              )}
-              {productDetails?.bantal_peluk && (
-                <Typography variant="body2" gutterBottom>
-                  Bantal Peluk
-                </Typography>
-              )}
-              {productDetails?.bantal_sandaran && (
-                <Typography variant="body2" gutterBottom>
-                  Bantal Sandaran
                 </Typography>
               )}
             </Grid>
@@ -332,6 +317,29 @@ const KomplimenForm = ({
                   : {productDetails?.kaki}
                 </Typography>
               )}
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item size={6}>
+          <Grid container spacing={1}>
+            <Grid item size={6}>
+              {productDetails?.dudukan && (
+                <Typography variant="body2" gutterBottom>
+                  Dudukan
+                </Typography>
+              )}
+              {productDetails?.bantal_peluk && (
+                <Typography variant="body2" gutterBottom>
+                  Bantal Peluk
+                </Typography>
+              )}
+              {productDetails?.bantal_sandaran && (
+                <Typography variant="body2" gutterBottom>
+                  Bantal Sandaran
+                </Typography>
+              )}
+            </Grid>
+            <Grid item size={6}>
               {productDetails?.dudukan && (
                 <Typography variant="body2" gutterBottom>
                   : {productDetails?.dudukan}

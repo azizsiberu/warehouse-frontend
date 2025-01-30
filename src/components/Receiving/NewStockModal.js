@@ -162,6 +162,19 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
       });
     }
 
+    // Validasi untuk Apakah Komplit
+    if (!isComplete) {
+      errors.isComplete = "Harap pilih apakah produk komplit atau tidak.";
+      isValid = false;
+    }
+
+    // Validasi untuk Stok atau Sudah Dipesan
+    if (!productStatus) {
+      errors.productStatus =
+        "Harap pilih apakah produk stok atau sudah dipesan.";
+      isValid = false;
+    }
+
     setValidationErrors(errors);
     return isValid;
   };
@@ -227,7 +240,7 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
           p: 4,
           borderRadius: 2,
           width: "90%",
-          maxWidth: 500,
+          maxWidth: 600,
           boxShadow: 24,
         }}
       >
@@ -286,7 +299,11 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
           </Box>
         </Box>{" "}
         <Box>
-          <FormControl component="fieldset">
+          <FormControl
+            component="fieldset"
+            fullWidth
+            error={!!validationErrors.isComplete}
+          >
             <Typography variant="body2" gutterBottom>
               Apakah Komplit?
             </Typography>
@@ -298,6 +315,9 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
                 label="Tidak"
               />
             </RadioGroup>
+            {validationErrors.isComplete && (
+              <FormHelperText>{validationErrors.isComplete}</FormHelperText>
+            )}
           </FormControl>
           {isComplete === "Tidak" && (
             <TextField
@@ -310,9 +330,14 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
               value={incompleteDetail}
             />
           )}
-          <FormControl component="fieldset" mt={2}>
+          <FormControl
+            component="fieldset"
+            mt={2}
+            fullWidth
+            error={!!validationErrors.productStatus}
+          >
             <Typography variant="body2" gutterBottom>
-              Apakah produk ini merupakan stok atau sudah dipesan?
+              Stok atau Sudah Dipesan?
             </Typography>
             <RadioGroup
               row
@@ -326,6 +351,9 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
                 label="Sudah Dipesan"
               />
             </RadioGroup>
+            {validationErrors.productStatus && (
+              <FormHelperText>{validationErrors.productStatus}</FormHelperText>
+            )}
           </FormControl>
           {(productStatus === "Stok" || productStatus === "Sudah Dipesan") && (
             <TextField

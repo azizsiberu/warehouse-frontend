@@ -15,6 +15,8 @@ import kendaraanReducer from "./reducers/kendaraanReducer";
 import overviewReducer from "./reducers/overviewReducer";
 import stockManagementReducer from "./reducers/stockManagementReducer";
 
+import scheduleReducer from "./reducers/scheduleReducer";
+
 const store = configureStore({
   reducer: {
     products: productReducer,
@@ -31,6 +33,8 @@ const store = configureStore({
 
     overview: overviewReducer,
     stockManagement: stockManagementReducer,
+
+    schedules: scheduleReducer,
   },
 });
 
