@@ -5,7 +5,7 @@ import { Button } from "@mui/material";
 const FinalizeButton = ({ onClick }) => {
   return (
     <Button variant="contained" color="primary" onClick={onClick}>
-      Finalisasi Jadwal
+      Pilih dari Stok
     </Button>
   );
 };

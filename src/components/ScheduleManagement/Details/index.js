@@ -54,6 +54,18 @@ const ScheduleDetailIndex = () => {
   return (
     <Box sx={{ padding: 2 }}>
       <ScheduleDetailHeader schedule={schedule} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          py: 2,
+        }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          Produk yang Dipesan
+        </Typography>
+      </Box>
       <ProductList scheduleDetails={schedule} />
     </Box>
   );

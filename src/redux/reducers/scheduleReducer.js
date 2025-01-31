@@ -1,6 +1,10 @@
 // path: /src/redux/reducers/scheduleReducer.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getSchedules, getScheduleById } from "../../services/api";
+import {
+  getSchedules,
+  getScheduleById,
+  getFinalStockByScheduleId,
+} from "../../services/api";
 
 // Async thunk untuk mengambil semua jadwal sementara
 export const fetchSchedules = createAsyncThunk(
@@ -24,11 +28,23 @@ export const fetchScheduleById = createAsyncThunk(
   }
 );
 
+// Async thunk untuk mengambil data final stock berdasarkan ID jadwal
+export const fetchFinalStockByScheduleId = createAsyncThunk(
+  "schedules/fetchFinalStockByScheduleId",
+  async (id) => {
+    console.log(`Fetching final stock for schedule ID: ${id}`);
+    const finalStock = await getFinalStockByScheduleId(id);
+    console.log("Fetched final stock:", finalStock);
+    return finalStock;
+  }
+);
+
 const scheduleSlice = createSlice({
   name: "schedules",
   initialState: {
     list: [],
     currentSchedule: null,
+    finalStock: null,
     loading: false,
     error: null,
   },
@@ -69,6 +85,24 @@ const scheduleSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
         console.error("Failed to fetch schedule by ID:", action.error.message);
+      })
+      .addCase(fetchFinalStockByScheduleId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log("Fetching final stock... Pending state");
+      })
+      .addCase(fetchFinalStockByScheduleId.fulfilled, (state, action) => {
+        state.finalStock = action.payload;
+        state.loading = false;
+        console.log("Fetched final stock successfully:", action.payload);
+      })
+      .addCase(fetchFinalStockByScheduleId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+        console.error(
+          "Fetching final stock failed. Error:",
+          action.error.message
+        );
       });
   },
 });
