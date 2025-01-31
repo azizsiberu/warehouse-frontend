@@ -2,34 +2,12 @@
 import React, { useState } from "react";
 import { Box, Chip, Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import ProductDrawer from "./ProductDrawer";
-import ProductDetailPopup from "./ProductDetailPopup";
 import { useDispatch } from "react-redux";
 import { fetchFinalStockByScheduleId } from "../../../redux/reducers/scheduleReducer";
 
 const ProductList = ({ scheduleDetails }) => {
   const products = scheduleDetails?.product_details || [];
   const dispatch = useDispatch();
-
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [openDetailPopup, setOpenDetailPopup] = useState(false);
-
-  const handleOpenDrawer = (product) => {
-    setSelectedProduct(product); // Menyimpan produk yang dipilih
-    setOpenDrawer(true); // Membuka Drawer
-  };
-
-  const handleCloseDrawer = () => setOpenDrawer(false);
-
-  const handleOpenDetailPopup = (product) => {
-    setSelectedProduct(product);
-    setOpenDetailPopup(true);
-  };
-
-  const handleCloseDetailPopup = () => setOpenDetailPopup(false);
-
-  console.log("Received products:", products);
 
   if (!Array.isArray(products) || products.length === 0) {
     console.error("Expected products to be a non-empty array.");
@@ -179,11 +157,7 @@ const ProductList = ({ scheduleDetails }) => {
                       </Typography>
 
                       {/* Tombol untuk memilih produk */}
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleOpenDrawer(product)} // Pastikan product diteruskan
-                      >
+                      <Button variant="outlined" color="primary">
                         Pilih Stok
                       </Button>
                     </Box>
@@ -196,20 +170,6 @@ const ProductList = ({ scheduleDetails }) => {
           );
         })}
       </Grid>
-
-      {/* Drawer untuk memilih produk */}
-      <ProductDrawer
-        open={openDrawer}
-        onClose={handleCloseDrawer}
-        productId={selectedProduct?.product_id} // Mengirimkan productId ke ProductDrawer
-      />
-
-      {/* Popup Detail Produk */}
-      <ProductDetailPopup
-        open={openDetailPopup}
-        product={selectedProduct}
-        onClose={handleCloseDetailPopup}
-      />
     </Box>
   );
 };
