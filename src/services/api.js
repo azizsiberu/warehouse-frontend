@@ -27,17 +27,31 @@ api.interceptors.request.use(
 // Interceptor untuk respon mengarahkan ke login jika token expired
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.log("Error in interceptor:", error.response?.status); // Debug log
+  async (error) => {
+    console.log("Interceptor Error:", error.response?.status);
+
     if (error.response?.status === 401 || error.response?.status === 403) {
       store.dispatch(clearAuth());
       localStorage.removeItem("authToken");
-      console.log("Redirecting to /login due to unauthorized access"); // Debug log for redirect
+
+      console.log("Redirecting to login due to unauthorized access");
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );
+
+// Fungsi untuk **validasi token** saat aplikasi pertama kali dijalankan
+export const validateToken = async () => {
+  try {
+    const response = await api.get("/api/auth/validate-token");
+    return response.data; // Jika token valid, lanjutkan
+  } catch (error) {
+    console.error("Token tidak valid:", error);
+    throw error;
+  }
+};
 
 // Fungsi untuk registrasi pengguna baru
 export const registerUser = async (userData) => {

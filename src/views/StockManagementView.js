@@ -5,10 +5,11 @@ import {
   fetchFinalStocks,
   fetchWarehouses,
 } from "../redux/reducers/stockManagementReducer";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Filters from "../components/StockManagement/Filters";
 import StockTable from "../components/StockManagement/StockTable";
+import Loading from "../components/Loading";
 
 const StockManagementView = ({ setPageTitle }) => {
   const dispatch = useDispatch();
@@ -28,18 +29,7 @@ const StockManagementView = ({ setPageTitle }) => {
   }, [dispatch]);
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
 
   if (error) {

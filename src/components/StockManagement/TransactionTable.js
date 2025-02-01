@@ -3,7 +3,8 @@ import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStockTransactions } from "../../redux/reducers/stockManagementReducer";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import Loading from "../Loading";
 
 const TransactionTable = ({ productId, warehouseId }) => {
   const dispatch = useDispatch();
@@ -25,11 +26,7 @@ const TransactionTable = ({ productId, warehouseId }) => {
   }, [productId, warehouseId, dispatch]);
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
 
   if (error) {

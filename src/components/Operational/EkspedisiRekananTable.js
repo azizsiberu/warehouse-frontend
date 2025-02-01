@@ -18,10 +18,10 @@ import {
   Paper,
   Button,
   Box,
-  CircularProgress,
   Modal,
   TextField,
 } from "@mui/material";
+import Loading from "../Loading";
 
 const EkspedisiRekananTable = () => {
   const dispatch = useDispatch();
@@ -108,11 +108,7 @@ const EkspedisiRekananTable = () => {
 
   if (loading) {
     console.log("[EkspedisiRekananTable] Displaying loading spinner");
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
 
   if (error) {

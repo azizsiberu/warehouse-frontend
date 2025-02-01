@@ -24,7 +24,12 @@ import OutgoingDetailView from "../views/OutgoingDetailView";
 import OutgoingLabelView from "../views/OutgoingLabelView";
 import ScheduleManagementView from "../views/ScheduleManagementView";
 import ScheduleDetailView from "../views/ScheduleDetailView";
-import { clearAuth } from "../redux/reducers/authReducer";
+import ScheduleConfirmationView from "../views/ScheduleConfirmationView";
+
+import {
+  checkAuthStatus,
+  validateUserToken,
+} from "../redux/reducers/authReducer";
 
 const APP_NAME = "Ajeg Gudang"; // Define your application name here
 
@@ -41,6 +46,18 @@ const AppRoutes = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (
+      !isAuthenticated &&
+      !["/login", "/register", "/verify-code", "/reset-password"].includes(
+        location.pathname
+      )
+    ) {
+      dispatch(validateUserToken()); // 🔥 Validasi token hanya jika user bukan di halaman login
+    }
+    dispatch(checkAuthStatus());
+  }, [dispatch, location.pathname]);
 
   useEffect(() => {
     // Periksa apakah pengguna sudah login atau belum
@@ -154,6 +171,12 @@ const AppRoutes = () => {
                 <ScheduleDetailView setPageTitle={updateDocumentTitle} />
               }
             />{" "}
+            <Route
+              path="/schedule-confirmation"
+              element={
+                <ScheduleConfirmationView setPageTitle={updateDocumentTitle} />
+              }
+            />
             {/* Route untuk detail jadwal */}
             {/* Tambahkan rute lainnya yang dilindungi di sini */}
           </Route>

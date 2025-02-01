@@ -8,7 +8,8 @@ import {
 } from "../../../redux/reducers/scheduleReducer";
 import ScheduleDetailHeader from "./ScheduleDetailHeader";
 import ProductList from "./ProductList";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import Loading from "../../Loading";
 
 const ScheduleDetailIndex = () => {
   const { id } = useParams();
@@ -53,18 +54,7 @@ const ScheduleDetailIndex = () => {
   }, [dispatch, schedule, finalStock, loading]);
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loading />;
   }
 
   if (error) {
