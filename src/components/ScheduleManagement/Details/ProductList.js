@@ -1,13 +1,20 @@
 //path: src/components/ScheduleManagement/Details/ProductList.js
 import React, { useState } from "react";
-import { Box, Chip, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Chip,
+  Typography,
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useDispatch } from "react-redux";
-import { fetchFinalStockByScheduleId } from "../../../redux/reducers/scheduleReducer";
+import StockAccordion from "./StockAccordion";
 
-const ProductList = ({ scheduleDetails }) => {
+const ProductList = ({ scheduleDetails, finalStock }) => {
   const products = scheduleDetails?.product_details || [];
-  const dispatch = useDispatch();
 
   if (!Array.isArray(products) || products.length === 0) {
     console.error("Expected products to be a non-empty array.");
@@ -155,16 +162,18 @@ const ProductList = ({ scheduleDetails }) => {
                       <Typography variant="h5">
                         {product.product_name} x {product.quantity}
                       </Typography>
-
-                      {/* Tombol untuk memilih produk */}
-                      <Button variant="outlined" color="primary">
-                        Pilih Stok
-                      </Button>
                     </Box>
                     {renderSpesification(product)}
                     {renderVariants(product)}
                   </Grid>
                 </Grid>
+                <Typography variant="h6" sx={{ marginTop: 2 }}>
+                  Stok Tersedia
+                </Typography>
+                <StockAccordion
+                  productId={product.product_id}
+                  finalStock={finalStock}
+                />
               </Box>
             </Grid>
           );

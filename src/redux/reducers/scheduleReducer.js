@@ -44,7 +44,7 @@ const scheduleSlice = createSlice({
   initialState: {
     list: [],
     currentSchedule: null,
-    finalStock: null,
+    finalStock: [],
     loading: false,
     error: null,
   },
@@ -87,15 +87,24 @@ const scheduleSlice = createSlice({
         console.error("Failed to fetch schedule by ID:", action.error.message);
       })
       .addCase(fetchFinalStockByScheduleId.pending, (state) => {
+        // Jika sudah ada data finalStock, tidak perlu ambil lagi
+        if (state.finalStock.length > 0) {
+          console.log("Final stock already fetched, skipping fetch.");
+          return;
+        }
         state.loading = true;
         state.error = null;
         console.log("Fetching final stock... Pending state");
       })
       .addCase(fetchFinalStockByScheduleId.fulfilled, (state, action) => {
-        state.finalStock = action.payload;
+        state.finalStock = action.payload; // Pastikan action.payload memiliki data yang benar
         state.loading = false;
-        console.log("Fetched final stock successfully:", action.payload);
+        if (action.payload.length === 0) {
+          console.log("No stock available for the product.");
+        }
+        console.log("Fetched final stock successfully:", action.payload); // Log hasil yang diterima dari API
       })
+
       .addCase(fetchFinalStockByScheduleId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
