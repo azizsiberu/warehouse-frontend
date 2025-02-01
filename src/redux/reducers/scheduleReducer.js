@@ -39,17 +39,45 @@ export const fetchFinalStockByScheduleId = createAsyncThunk(
   }
 );
 
+// Action untuk memilih stok
+export const addSelectedStock = (stock) => (dispatch, getState) => {
+  const { selectedStock } = getState().schedules;
+
+  // Hapus stok sebelumnya jika ada untuk produk yang sama
+  const filteredStock = selectedStock.filter(
+    (item) => item.final_id_produk !== stock.final_id_produk
+  );
+
+  dispatch({
+    type: "schedules/setSelectedStock",
+    payload: [...filteredStock, stock], // Simpan stok baru untuk produk ini
+  });
+};
+
+// Action untuk menghapus stok dari selectedStock
+export const removeSelectedStock = (stockId) => (dispatch, getState) => {
+  const { selectedStock } = getState().schedules;
+
+  dispatch({
+    type: "schedules/setSelectedStock",
+    payload: selectedStock.filter((item) => item.final_id !== stockId),
+  });
+};
+
 const scheduleSlice = createSlice({
   name: "schedules",
   initialState: {
     list: [],
     currentSchedule: null,
     finalStock: [],
+    selectedStock: [],
     loading: false,
     error: null,
   },
   reducers: {
-    // Reducer tambahan bisa ditambahkan jika diperlukan
+    setSelectedStock: (state, action) => {
+      state.selectedStock = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -97,21 +125,31 @@ const scheduleSlice = createSlice({
         console.log("Fetching final stock... Pending state");
       })
       .addCase(fetchFinalStockByScheduleId.fulfilled, (state, action) => {
-        state.finalStock = action.payload; // Pastikan action.payload memiliki data yang benar
+        const newStock = action.payload.filter(
+          (newItem) =>
+            !state.finalStock.some(
+              (existing) => existing.final_id === newItem.final_id
+            )
+        );
+
+        state.finalStock = [...state.finalStock, ...newStock];
         state.loading = false;
+
         if (action.payload.length === 0) {
           console.log("No stock available for the product.");
         }
-        console.log("Fetched final stock successfully:", action.payload); // Log hasil yang diterima dari API
+        console.log("Fetched final stock successfully:", action.payload);
       })
 
       .addCase(fetchFinalStockByScheduleId.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
         console.error(
           "Fetching final stock failed. Error:",
           action.error.message
         );
+
+        // Simpan error khusus untuk stok tanpa mempengaruhi error utama Redux
+        state.finalStockError = action.error.message;
       });
   },
 });

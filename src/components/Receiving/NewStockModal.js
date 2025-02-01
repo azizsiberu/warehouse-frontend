@@ -242,6 +242,8 @@ const NewStockModal = ({ open, onClose, product, handleSubmitProduct }) => {
           width: "90%",
           maxWidth: 600,
           boxShadow: 24,
+          maxHeight: "90vh",
+          overflowY: "auto",
         }}
       >
         <Grid container justifyContent="space-between" alignItems="center">

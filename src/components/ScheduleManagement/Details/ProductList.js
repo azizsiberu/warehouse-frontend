@@ -13,7 +13,7 @@ import Grid from "@mui/material/Grid2";
 import { useDispatch } from "react-redux";
 import StockAccordion from "./StockAccordion";
 
-const ProductList = ({ scheduleDetails, finalStock }) => {
+const ProductList = ({ scheduleDetails, finalStock, error }) => {
   const products = scheduleDetails?.product_details || [];
 
   if (!Array.isArray(products) || products.length === 0) {
@@ -173,6 +173,12 @@ const ProductList = ({ scheduleDetails, finalStock }) => {
                 <StockAccordion
                   productId={product.product_id}
                   finalStock={finalStock}
+                  error={error}
+                  onSelectStock={(selectedStock) => {
+                    console.log("Stok yang dipilih:", selectedStock);
+                    // Tambahkan logika untuk mengupdate Redux atau state lokal di sini
+                  }}
+                  orderedQuantity={product.quantity}
                 />
               </Box>
             </Grid>

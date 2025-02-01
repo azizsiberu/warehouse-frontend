@@ -1,7 +1,8 @@
-// path: src/components/ScheduleManagement/ScheduleDetailHeader.js
-import React from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import { useSelector } from "react-redux";
+import SelectedStockDrawer from "./SelectedStockDrawer";
 
 const ScheduleDetailHeader = ({ schedule }) => {
   const formatDate = (dateString) => {
@@ -10,14 +11,21 @@ const ScheduleDetailHeader = ({ schedule }) => {
     return date.toLocaleDateString("id-ID", options);
   };
 
+  // Ambil stok terpilih dari Redux
+  const selectedStock = useSelector((state) => state.schedules.selectedStock);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+
   return (
     <Box
       sx={{
         paddingBottom: 3,
         borderBottom: 1,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
       }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ flexGrow: 1 }}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Grid container spacing={2}>
             <Grid size={6}>
@@ -50,8 +58,24 @@ const ScheduleDetailHeader = ({ schedule }) => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}></Grid>
       </Grid>
+
+      {/* Tombol "Lihat Stok Terpilih" */}
+      {selectedStock.length > 0 && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setDrawerOpen(true)}
+        >
+          Lihat Stok Terpilih ({selectedStock.length})
+        </Button>
+      )}
+
+      {/* **Gunakan Drawer yang Sudah Ada** */}
+      <SelectedStockDrawer
+        open={isDrawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
     </Box>
   );
 };

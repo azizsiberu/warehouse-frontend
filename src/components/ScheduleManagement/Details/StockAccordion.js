@@ -1,60 +1,221 @@
 // path: src/components/ScheduleManagement/Details/StockAccordion.js
-import React from "react";
+import React, { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Typography,
   Box,
+  Button,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { MdArrowDropDownCircle } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addSelectedStock,
+  removeSelectedStock,
+} from "../../../redux/reducers/scheduleReducer";
 
-const StockAccordion = ({ productId, finalStock }) => {
-  // Filter untuk stok produk yang sesuai dengan ID produk
+// Fungsi untuk menampilkan spesifikasi produk di dalam accordion
+const renderSpesification = (stock) => {
+  return (
+    <Box sx={{ marginTop: 2 }}>
+      <Typography variant="h6">Spesifikasi</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box>
+          <Typography>Dimensi</Typography>
+          {(stock.final_kain || stock.sofa_kain) && (
+            <Typography>Kain</Typography>
+          )}
+          {(stock.final_kaki || stock.sofa_kaki) && (
+            <Typography>Kaki</Typography>
+          )}
+          {(stock.final_dudukan || stock.sofa_dudukan) && (
+            <Typography>Dudukan</Typography>
+          )}
+          {(stock.final_bantal_peluk !== null ||
+            stock.sofa_bantal_peluk !== null) && (
+            <Typography>Bantal Peluk</Typography>
+          )}
+          {(stock.final_bantal_sandaran !== null ||
+            stock.sofa_bantal_sandaran !== null) && (
+            <Typography>Bantal Sandaran</Typography>
+          )}
+          {(stock.final_kantong_remot !== null ||
+            stock.sofa_kantong_remot !== null) && (
+            <Typography>Kantong Remot</Typography>
+          )}
+          {stock.sofa_puff && <Typography>Puff</Typography>}
+        </Box>
+        <Box>
+          <Typography>
+            : {stock.panjang || stock.sofa_panjang} x{" "}
+            {stock.lebar || stock.sofa_lebar} x{" "}
+            {stock.tinggi || stock.sofa_tinggi} cm
+          </Typography>
+          {(stock.final_kain || stock.sofa_kain) && (
+            <Typography>: {stock.final_kain || stock.sofa_kain}</Typography>
+          )}
+          {(stock.final_kaki || stock.sofa_kaki) && (
+            <Typography>: {stock.final_kaki || stock.sofa_kaki}</Typography>
+          )}
+          {(stock.final_dudukan || stock.sofa_dudukan) && (
+            <Typography>
+              : {stock.final_dudukan || stock.sofa_dudukan}
+            </Typography>
+          )}
+          {(stock.final_bantal_peluk !== null ||
+            stock.sofa_bantal_peluk !== null) && (
+            <Typography>
+              : {stock.final_bantal_peluk ?? stock.sofa_bantal_peluk}
+            </Typography>
+          )}
+          {(stock.final_bantal_sandaran !== null ||
+            stock.sofa_bantal_sandaran !== null) && (
+            <Typography>
+              : {stock.final_bantal_sandaran ?? stock.sofa_bantal_sandaran}
+            </Typography>
+          )}
+          {(stock.final_kantong_remot !== null ||
+            stock.sofa_kantong_remot !== null) && (
+            <Typography>
+              : {stock.final_kantong_remot ?? stock.sofa_kantong_remot}
+            </Typography>
+          )}
+          {stock.sofa_puff && (
+            <Typography>: {stock.sofa_puff ? "Ya" : "Tidak"}</Typography>
+          )}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+// Fungsi untuk menampilkan varian produk di dalam accordion
+const renderVariants = (stock) => {
+  return (
+    <Box sx={{ marginTop: 2 }}>
+      <Typography variant="h6">Varian</Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box>
+          {stock.final_warna && <Typography>Warna</Typography>}
+          {stock.final_finishing && <Typography>Finishing</Typography>}
+        </Box>
+        <Box>
+          {stock.final_warna && <Typography>: {stock.final_warna}</Typography>}
+          {stock.final_finishing && (
+            <Typography>: {stock.final_finishing}</Typography>
+          )}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+const StockAccordion = ({
+  productId,
+  finalStock,
+  orderedQuantity,
+  onSelectStock,
+}) => {
+  const dispatch = useDispatch();
+  const selectedStock = useSelector((state) => state.schedules.selectedStock);
+  const [selectedStockId, setSelectedStockId] = useState(null);
+
   const productStock = finalStock.filter(
-    (stock) => stock.id_produk === productId
+    (stock) => stock.final_id_produk === productId
   );
 
+  const handleSelectStock = (stock) => {
+    const alreadySelected = selectedStock.find(
+      (item) => item.final_id === stock.final_id
+    );
+
+    if (alreadySelected) {
+      // Jika stok sudah dipilih, hapus dari Redux
+      dispatch(removeSelectedStock(stock.final_id));
+      console.log("Unselected stock:", stock);
+    } else {
+      // Menyertakan jumlah produk yang dipesan
+      const selectedData = {
+        ...stock,
+        jumlah: orderedQuantity, // Sesuaikan dengan jumlah yang dipesan
+      };
+
+      dispatch(addSelectedStock(selectedData));
+      console.log("Selected stock:", selectedData);
+    }
+  };
+
   return (
-    <>
+    <Box sx={{ marginTop: 2 }}>
       {productStock.length > 0 ? (
-        // Map untuk merender setiap stok yang ditemukan
-        productStock.map((stock, index) => (
-          <Accordion key={index} sx={{ marginTop: 2 }}>
+        productStock.map((stock) => (
+          <Accordion key={stock.final_id} sx={{ marginBottom: 1 }}>
             <AccordionSummary expandIcon={<MdArrowDropDownCircle />}>
               <Typography variant="h6">
-                {/* Menampilkan warna, finishing, gudang, dan stok untuk setiap stok produk */}
-                {`${stock.final_warna} - ${stock.final_finishing} - ${stock.final_gudang} - ${stock.stok_tersedia} unit`}
+                {stock.final_warna} - {stock.final_finishing} -{" "}
+                {stock.final_gudang} - {stock.final_stok_tersedia} unit
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Box sx={{ padding: 1, borderBottom: "1px solid #ddd" }}>
-                <Typography variant="body1">
-                  <strong>Warna:</strong>{" "}
-                  {stock.final_warna || "Tidak ada data"}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Finishing:</strong>{" "}
-                  {stock.final_finishing || "Tidak ada data"}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Stok Tersedia:</strong> {stock.stok_tersedia} unit
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Lokasi:</strong>{" "}
-                  {stock.warehouse_lokasi || "Tidak diketahui"}
-                </Typography>
+                <Typography variant="h5">{stock.produk_nama}</Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Box>
+                    <Typography variant="body1">Stok Tersedia</Typography>
+                    <Typography variant="body1">Lokasi</Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body1">
+                      <strong>: {stock.final_stok_tersedia}</strong> unit
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>
+                        : {stock.final_gudang || "Tidak diketahui"}
+                      </strong>
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {renderSpesification(stock)}
+                {renderVariants(stock)}
+
+                {/* Tombol Pilih/Batal Pilih Stok */}
+                <Button
+                  variant={
+                    selectedStock.some(
+                      (item) => item.final_id === stock.final_id
+                    )
+                      ? "outlined"
+                      : "contained"
+                  }
+                  color="primary"
+                  sx={{ marginTop: 2 }}
+                  onClick={() => {
+                    console.log(
+                      "Clicked stock selection button for:",
+                      stock.final_id
+                    );
+                    handleSelectStock(stock);
+                  }}
+                >
+                  {selectedStock.some(
+                    (item) => item.final_id === stock.final_id
+                  )
+                    ? "Batal Pilih"
+                    : "Pilih Stok"}
+                </Button>
               </Box>
             </AccordionDetails>
           </Accordion>
         ))
       ) : (
-        // Jika tidak ada stok untuk produk
         <Typography variant="body1" color="error">
           Tidak ada stok tersedia untuk produk ini.
         </Typography>
       )}
-    </>
+    </Box>
   );
 };
 

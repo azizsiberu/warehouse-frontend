@@ -13,7 +13,6 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 const ScheduleDetailIndex = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-
   // Ambil schedule dan finalStock dari Redux
   const schedule = useSelector((state) => state.schedules.currentSchedule);
   const finalStock = useSelector((state) => state.schedules.finalStock);
@@ -38,16 +37,16 @@ const ScheduleDetailIndex = () => {
           return;
         }
 
-        const existingStock = finalStock.find(
-          (stock) => stock.id_produk === productId
+        // ✅ Pastikan kita tidak mem-fetch stok jika sudah ada di Redux
+        const isStockAlreadyFetched = finalStock.some(
+          (stock) => stock.final_id_produk === productId
         );
 
-        if (!existingStock && !loading) {
-          // Pastikan tidak ada data dan tidak dalam keadaan loading
+        if (!isStockAlreadyFetched && !loading) {
           console.log("Fetching stock for product ID:", productId);
-          dispatch(fetchFinalStockByScheduleId(productId)); // Fetch hanya jika data belum ada
+          dispatch(fetchFinalStockByScheduleId(productId));
         } else {
-          console.log("Stock already fetched for product ID:", productId);
+          console.log("Stock already exists for product ID:", productId);
         }
       });
     }
