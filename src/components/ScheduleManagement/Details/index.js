@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchScheduleById,
-  fetchFinalStockByScheduleId,
+  fetchFinalStockByProductId,
 } from "../../../redux/reducers/scheduleReducer";
 import ScheduleDetailHeader from "./ScheduleDetailHeader";
 import ProductList from "./ProductList";
@@ -19,6 +19,9 @@ const ScheduleDetailIndex = () => {
   const finalStock = useSelector((state) => state.schedules.finalStock);
   const loading = useSelector((state) => state.schedules.loading);
   const error = useSelector((state) => state.schedules.error);
+  const emptyStockProducts = useSelector(
+    (state) => state.schedules.emptyStockProducts
+  );
 
   // Fetch schedule jika belum ada di Redux
   useEffect(() => {
@@ -32,26 +35,28 @@ const ScheduleDetailIndex = () => {
     if (schedule) {
       schedule.product_details.forEach((product) => {
         const productId = parseInt(product.product_id, 10);
+        if (isNaN(productId)) return;
 
-        if (isNaN(productId)) {
-          console.error("Invalid product ID:", product.product_id);
-          return;
-        }
-
-        // ✅ Pastikan kita tidak mem-fetch stok jika sudah ada di Redux
         const isStockAlreadyFetched = finalStock.some(
           (stock) => stock.final_id_produk === productId
         );
 
-        if (!isStockAlreadyFetched && !loading) {
+        const isProductEmpty = emptyStockProducts.includes(productId); // ✅ Cek apakah produk sudah ditandai kosong
+
+        if (!isStockAlreadyFetched && !isProductEmpty && !loading) {
           console.log("Fetching stock for product ID:", productId);
-          dispatch(fetchFinalStockByScheduleId(productId));
+          dispatch(fetchFinalStockByProductId(productId));
+        } else if (isProductEmpty) {
+          console.log(
+            "Skipping fetch, product already marked as empty:",
+            productId
+          );
         } else {
           console.log("Stock already exists for product ID:", productId);
         }
       });
     }
-  }, [dispatch, schedule, finalStock, loading]);
+  }, [dispatch, schedule, finalStock, emptyStockProducts, loading]);
 
   if (loading) {
     return <Loading />;

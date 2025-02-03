@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -15,7 +16,6 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HomeIcon from "@mui/icons-material/Home";
 import { MdCircleNotifications } from "react-icons/md";
-import { useSelector, useDispatch } from "react-redux";
 import { clearAuth } from "../redux/reducers/authReducer";
 import DefaultLogo from "../assets/logo/logo-ajeg-hijau-64.webp";
 
@@ -37,11 +37,17 @@ const CustomAppBar = ({ pageTitle }) => {
     setAnchorEl(null);
   };
 
-  const handleBackHome = () => {
-    navigate(-1);
+  const handleBack = () => {
+    console.log("🔄 Navigating back and refreshing...");
+    navigate(-1); // ✅ Kembali ke halaman sebelumnya
+    setTimeout(() => {
+      window.location.reload(); // ✅ Refresh halaman setelah navigasi
+    }, 100); // Beri sedikit jeda untuk memastikan navigasi selesai
   };
 
   const handleGoHome = () => {
+    console.log("🔄 Membersihkan semua state kecuali token...");
+    dispatch({ type: "RESET_APP_STATE" }); // ✅ Reset semua state kecuali token
     navigate("/");
   };
 
@@ -88,7 +94,7 @@ const CustomAppBar = ({ pageTitle }) => {
             {/* Tombol Back */}
             <IconButton
               color="inherit"
-              onClick={handleBackHome}
+              onClick={handleBack}
               edge="start"
               sx={{ mx: 1 }}
             >

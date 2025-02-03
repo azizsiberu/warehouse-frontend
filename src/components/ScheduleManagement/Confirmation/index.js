@@ -12,7 +12,7 @@ const ScheduleConfirmation = ({
   onConfirm,
 }) => {
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box>
       {/* Header: Tujuan Pengiriman */}
       <ConfirmationHeader schedule={schedule} />
 

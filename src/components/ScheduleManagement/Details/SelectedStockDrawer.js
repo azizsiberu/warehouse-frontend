@@ -1,4 +1,7 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import dayjs from "dayjs"; // Untuk format tanggal
+import { useNavigate } from "react-router-dom";
 import {
   Drawer,
   Box,
@@ -9,13 +12,14 @@ import {
   TextField,
 } from "@mui/material";
 import { MdClose } from "react-icons/md";
-import { useSelector, useDispatch } from "react-redux";
 import { removeSelectedStock } from "../../../redux/reducers/scheduleReducer";
-import dayjs from "dayjs"; // Untuk format tanggal
 
 const SelectedStockDrawer = ({ open, onClose }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const selectedStock = useSelector((state) => state.schedules.selectedStock);
+  const schedule = useSelector((state) => state.schedules.currentSchedule);
+  console.log("📌 Redux currentSchedule:", schedule);
 
   // State untuk tanggal pengiriman
   const [deliveryDate, setDeliveryDate] = React.useState(
@@ -26,6 +30,28 @@ const SelectedStockDrawer = ({ open, onClose }) => {
   const handleDateChange = (event) => {
     setDeliveryDate(event.target.value);
     console.log("Tanggal pengiriman dipilih:", event.target.value);
+  };
+
+  const handleConfirmSchedule = () => {
+    if (!schedule) {
+      console.error("⚠️ Data jadwal tidak ditemukan! Periksa Redux state.");
+      console.log("📌 Redux currentSchedule:", schedule); // Debugging
+      return;
+    }
+
+    console.log("🚀 Navigasi ke halaman konfirmasi dengan data:", {
+      schedule, // ✅ Kirim seluruh Redux `currentSchedule`
+      tanggal_pengiriman: deliveryDate,
+      selectedStock,
+    });
+
+    navigate("/schedule-confirmation", {
+      state: {
+        schedule, // ✅ Kirim seluruh Redux `currentSchedule`
+        tanggal_pengiriman: deliveryDate,
+        selectedStock,
+      },
+    });
   };
 
   return (
@@ -121,9 +147,9 @@ const SelectedStockDrawer = ({ open, onClose }) => {
           )}
         </Box>
 
-        {/* Bagian bawah: Tanggal Pengiriman & Tombol */}
+        {/* 📅 Pick Date + Agendakan Pengiriman */}
         {selectedStock.length > 0 && (
-          <Box sx={{ padding: 2, borderTop: "1px solid #ddd" }}>
+          <Box sx={{ mt: "auto", p: 2 }}>
             <TextField
               label="Tanggal Pengiriman"
               type="date"
@@ -135,20 +161,12 @@ const SelectedStockDrawer = ({ open, onClose }) => {
               sx={{ mb: 2 }}
             />
 
-            {/* Tombol Agendakan Pengiriman */}
             <Button
               variant="contained"
               color="primary"
               fullWidth
               sx={{ padding: "10px", fontSize: "16px", fontWeight: "bold" }}
-              onClick={() =>
-                console.log(
-                  "Mengagendakan pengiriman...",
-                  selectedStock,
-                  "Tanggal:",
-                  deliveryDate
-                )
-              }
+              onClick={handleConfirmSchedule}
             >
               Agendakan Pengiriman
             </Button>

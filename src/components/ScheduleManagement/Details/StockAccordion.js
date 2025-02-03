@@ -180,6 +180,52 @@ const StockAccordion = ({
 
                 {renderSpesification(stock)}
                 {renderVariants(stock)}
+                {/* 🔹 Custom Detail (Jika Produk Custom) */}
+                {stock.final_is_custom && (
+                  <Box sx={{ border: "1px solid #ddd", padding: 2, mt: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      🔹 Custom Detail
+                    </Typography>
+                    <Box sx={{ display: "flex", gap: 2 }}>
+                      <Box sx={{ width: 120 }}>
+                        {stock.final_ukuran && <Typography>Ukuran</Typography>}
+                        {stock.final_kain && <Typography>Kain</Typography>}
+                        {stock.final_kaki && <Typography>Kaki</Typography>}
+                        {stock.final_dudukan && (
+                          <Typography>Dudukan</Typography>
+                        )}
+                        {stock.final_bantal_peluk !== null && (
+                          <Typography>Bantal Peluk</Typography>
+                        )}
+                        {stock.final_bantal_sandaran !== null && (
+                          <Typography>Bantal Sandaran</Typography>
+                        )}
+                      </Box>
+                      <Box>
+                        {stock.final_ukuran && (
+                          <Typography>: {stock.final_ukuran}</Typography>
+                        )}
+                        {stock.final_kain && (
+                          <Typography>: {stock.final_kain}</Typography>
+                        )}
+                        {stock.final_kaki && (
+                          <Typography>: {stock.final_kaki}</Typography>
+                        )}
+                        {stock.final_dudukan && (
+                          <Typography>: {stock.final_dudukan}</Typography>
+                        )}
+                        {stock.final_bantal_peluk !== null && (
+                          <Typography>: {stock.final_bantal_peluk}</Typography>
+                        )}
+                        {stock.final_bantal_sandaran !== null && (
+                          <Typography>
+                            : {stock.final_bantal_sandaran}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
 
                 {/* Tombol Pilih/Batal Pilih Stok */}
                 <Button

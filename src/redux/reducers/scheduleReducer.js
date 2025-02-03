@@ -3,8 +3,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getSchedules,
   getScheduleById,
-  getFinalStockByScheduleId,
+  getFinalStockByProductId,
 } from "../../services/api";
+
+const savedSchedule =
+  JSON.parse(localStorage.getItem("currentSchedule")) || null;
 
 // Async thunk untuk mengambil semua jadwal sementara
 export const fetchSchedules = createAsyncThunk(
@@ -28,14 +31,29 @@ export const fetchScheduleById = createAsyncThunk(
   }
 );
 
-// Async thunk untuk mengambil data final stock berdasarkan ID jadwal
-export const fetchFinalStockByScheduleId = createAsyncThunk(
-  "schedules/fetchFinalStockByScheduleId",
-  async (id) => {
-    console.log(`Fetching final stock for schedule ID: ${id}`);
-    const finalStock = await getFinalStockByScheduleId(id);
-    console.log("Fetched final stock:", finalStock);
-    return finalStock;
+// Async thunk untuk mengambil data final stock berdasarkan ID produk
+export const fetchFinalStockByProductId = createAsyncThunk(
+  "schedules/fetchFinalStockByProductId",
+  async (id, { rejectWithValue, dispatch }) => {
+    try {
+      console.log(`Fetching final stock for product ID: ${id}`);
+      const finalStock = await getFinalStockByProductId(id);
+
+      if (!finalStock || finalStock.length === 0) {
+        console.warn(`Final stock untuk produk ID ${id} tidak ditemukan.`);
+        dispatch(markProductAsEmpty(id)); // ✅ Langsung tandai sebagai kosong
+        return rejectWithValue("Stok tidak ditemukan");
+      }
+
+      console.log("Fetched final stock:", finalStock);
+      return finalStock;
+    } catch (error) {
+      console.error(`Failed to fetch final stock for product ID ${id}:`, error);
+      dispatch(markProductAsEmpty(id)); // ✅ Tangani error dengan menandai produk kosong
+      return rejectWithValue(
+        error.response?.data?.message || "Gagal mengambil stok"
+      );
+    }
   }
 );
 
@@ -68,15 +86,27 @@ const scheduleSlice = createSlice({
   name: "schedules",
   initialState: {
     list: [],
-    currentSchedule: null,
+    currentSchedule: savedSchedule,
     finalStock: [],
     selectedStock: [],
+    emptyStockProducts: [],
     loading: false,
     error: null,
   },
   reducers: {
     setSelectedStock: (state, action) => {
       state.selectedStock = action.payload;
+    },
+    setCurrentSchedule: (state, action) => {
+      state.currentSchedule = action.payload;
+      localStorage.setItem("currentSchedule", JSON.stringify(action.payload)); // ⬅️ Simpan ke localStorage
+    },
+    clearSchedule: (state) => {
+      state.currentSchedule = null;
+      localStorage.removeItem("currentSchedule"); // ⬅️ Hapus dari localStorage saat direset
+    },
+    markProductAsEmpty: (state, action) => {
+      state.emptyStockProducts.push(action.payload); // ✅ Tandai produk yang stoknya kosong
     },
   },
   extraReducers: (builder) => {
@@ -114,7 +144,7 @@ const scheduleSlice = createSlice({
         state.error = action.error.message;
         console.error("Failed to fetch schedule by ID:", action.error.message);
       })
-      .addCase(fetchFinalStockByScheduleId.pending, (state) => {
+      .addCase(fetchFinalStockByProductId.pending, (state) => {
         // Jika sudah ada data finalStock, tidak perlu ambil lagi
         if (state.finalStock.length > 0) {
           console.log("Final stock already fetched, skipping fetch.");
@@ -124,34 +154,45 @@ const scheduleSlice = createSlice({
         state.error = null;
         console.log("Fetching final stock... Pending state");
       })
-      .addCase(fetchFinalStockByScheduleId.fulfilled, (state, action) => {
-        const newStock = action.payload.filter(
-          (newItem) =>
-            !state.finalStock.some(
-              (existing) => existing.final_id === newItem.final_id
-            )
-        );
-
-        state.finalStock = [...state.finalStock, ...newStock];
-        state.loading = false;
-
+      .addCase(fetchFinalStockByProductId.fulfilled, (state, action) => {
         if (action.payload.length === 0) {
-          console.log("No stock available for the product.");
+          console.warn("Stok kosong, menandai produk ini sebagai kosong.");
+          state.emptyStockProducts.push(action.meta.arg); // ✅ Simpan ID produk yang stoknya kosong
+        } else {
+          const newStock = action.payload.filter(
+            (newItem) =>
+              !state.finalStock.some(
+                (existing) => existing.final_id === newItem.final_id
+              )
+          );
+          state.finalStock = [...state.finalStock, ...newStock];
         }
-        console.log("Fetched final stock successfully:", action.payload);
+        state.loading = false;
       })
 
-      .addCase(fetchFinalStockByScheduleId.rejected, (state, action) => {
+      .addCase(fetchFinalStockByProductId.rejected, (state, action) => {
         state.loading = false;
         console.error(
           "Fetching final stock failed. Error:",
           action.error.message
         );
 
+        // Jika produk tidak ditemukan (404), tandai sebagai stok kosong
+        if (action.payload === "Stok tidak ditemukan") {
+          const productId = action.meta.arg;
+          if (!state.emptyStockProducts.includes(productId)) {
+            console.warn(`Menandai produk ${productId} sebagai kosong.`);
+            state.emptyStockProducts.push(productId);
+          }
+        }
+
         // Simpan error khusus untuk stok tanpa mempengaruhi error utama Redux
         state.finalStockError = action.error.message;
       });
   },
 });
+
+export const { setCurrentSchedule, clearSchedule } = scheduleSlice.actions;
+export const { markProductAsEmpty } = scheduleSlice.actions;
 
 export default scheduleSlice.reducer;

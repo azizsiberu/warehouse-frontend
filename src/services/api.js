@@ -366,7 +366,7 @@ export const getScheduleById = async (id) => {
 };
 
 // Fungsi untuk mendapatkan final stock berdasarkan id jadwal
-export const getFinalStockByScheduleId = async (id) => {
+export const getFinalStockByProductId = async (id) => {
   const response = await api.get(`/api/schedules/stock/${id}`);
   console.log("Final stock for schedule id:", response.data);
   return response.data;
