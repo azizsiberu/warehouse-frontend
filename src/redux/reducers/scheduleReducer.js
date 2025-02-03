@@ -4,6 +4,9 @@ import {
   getSchedules,
   getScheduleById,
   getFinalStockByProductId,
+  finalizeSchedule,
+  getAllFinalSchedules,
+  getFinalScheduleById,
 } from "../../services/api";
 
 const savedSchedule =
@@ -82,6 +85,66 @@ export const removeSelectedStock = (stockId) => (dispatch, getState) => {
   });
 };
 
+// Async thunk untuk menyimpan jadwal pengiriman ke final_schedules
+export const finalizeScheduleThunk = createAsyncThunk(
+  "schedules/finalizeSchedule",
+  async (payload, { rejectWithValue }) => {
+    try {
+      console.log(
+        "🚀 Menyimpan jadwal pengiriman ke final_schedules:",
+        payload
+      );
+      const response = await finalizeSchedule(payload);
+      console.log("✅ Jadwal pengiriman berhasil disimpan:", response);
+      return response;
+    } catch (error) {
+      console.error("❌ Gagal menyimpan jadwal pengiriman:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Gagal menyimpan jadwal"
+      );
+    }
+  }
+);
+
+// 🔹 Fetch Semua Jadwal Final
+export const fetchAllFinalSchedules = createAsyncThunk(
+  "schedules/fetchAllFinalSchedules",
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log("📥 Fetching all final schedules...");
+      const schedules = await getAllFinalSchedules();
+      console.log("✅ Final schedules fetched:", schedules);
+      return schedules;
+    } catch (error) {
+      console.error("❌ Failed to fetch final schedules:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Gagal mengambil data"
+      );
+    }
+  }
+);
+
+// 🔹 Fetch Detail Jadwal Final Berdasarkan ID
+export const fetchFinalScheduleById = createAsyncThunk(
+  "schedules/fetchFinalScheduleById",
+  async (id_schedule, { rejectWithValue }) => {
+    try {
+      console.log(`📥 Fetching final schedule details for ID: ${id_schedule}`);
+      const scheduleDetail = await getFinalScheduleById(id_schedule);
+      console.log("✅ Final schedule details fetched:", scheduleDetail);
+      return scheduleDetail;
+    } catch (error) {
+      console.error(
+        `❌ Failed to fetch final schedule ID ${id_schedule}:`,
+        error
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Gagal mengambil detail jadwal"
+      );
+    }
+  }
+);
+
 const scheduleSlice = createSlice({
   name: "schedules",
   initialState: {
@@ -90,6 +153,8 @@ const scheduleSlice = createSlice({
     finalStock: [],
     selectedStock: [],
     emptyStockProducts: [],
+    finalSchedules: [], // 🆕 Menyimpan semua jadwal final
+    finalScheduleDetails: null, // 🆕 Menyimpan detail jadwal final
     loading: false,
     error: null,
   },
@@ -188,6 +253,59 @@ const scheduleSlice = createSlice({
 
         // Simpan error khusus untuk stok tanpa mempengaruhi error utama Redux
         state.finalStockError = action.error.message;
+      })
+      .addCase(finalizeScheduleThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log("⏳ Menyimpan jadwal pengiriman...");
+      })
+      .addCase(finalizeScheduleThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("✅ Jadwal pengiriman berhasil disimpan:", action.payload);
+      })
+      .addCase(finalizeScheduleThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        console.error("❌ Gagal menyimpan jadwal pengiriman:", action.payload);
+      })
+      // 🔹 Fetch Semua Jadwal Final
+      .addCase(fetchAllFinalSchedules.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log("⏳ Fetching all final schedules...");
+      })
+      .addCase(fetchAllFinalSchedules.fulfilled, (state, action) => {
+        state.finalSchedules = action.payload;
+        state.loading = false;
+        console.log("✅ Final schedules fetched successfully:", action.payload);
+      })
+      .addCase(fetchAllFinalSchedules.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        console.error("❌ Failed to fetch final schedules:", action.payload);
+      })
+
+      // 🔹 Fetch Detail Jadwal Final Berdasarkan ID
+      .addCase(fetchFinalScheduleById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log("⏳ Fetching final schedule details...");
+      })
+      .addCase(fetchFinalScheduleById.fulfilled, (state, action) => {
+        state.finalScheduleDetails = action.payload;
+        state.loading = false;
+        console.log(
+          "✅ Final schedule details fetched successfully:",
+          action.payload
+        );
+      })
+      .addCase(fetchFinalScheduleById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        console.error(
+          "❌ Failed to fetch final schedule details:",
+          action.payload
+        );
       });
   },
 });

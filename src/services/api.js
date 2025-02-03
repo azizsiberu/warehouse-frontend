@@ -372,4 +372,22 @@ export const getFinalStockByProductId = async (id) => {
   return response.data;
 };
 
+// Fungsi untuk menyimpan jadwal pengiriman ke tabel final_schedules
+export const finalizeSchedule = async (payload) => {
+  const response = await api.post("/api/schedules/final", payload);
+  return response.data;
+};
+
+// 🔹 Ambil semua jadwal pengiriman final
+export const getAllFinalSchedules = async () => {
+  const response = await api.get("/api/schedules/final");
+  return response.data;
+};
+
+// 🔹 Ambil detail jadwal final berdasarkan ID
+export const getFinalScheduleById = async (id_schedule) => {
+  const response = await api.get(`/api/schedules/final/${id_schedule}`);
+  return response.data;
+};
+
 export default api;

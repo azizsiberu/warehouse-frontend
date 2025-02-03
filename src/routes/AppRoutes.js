@@ -25,6 +25,7 @@ import OutgoingLabelView from "../views/OutgoingLabelView";
 import ScheduleManagementView from "../views/ScheduleManagementView";
 import ScheduleDetailView from "../views/ScheduleDetailView";
 import ScheduleConfirmationView from "../views/ScheduleConfirmationView";
+import NotFound from "../views/NotFoundView";
 
 import {
   checkAuthStatus,
@@ -101,6 +102,10 @@ const AppRoutes = () => {
 
           {/* Bungkus rute yang dilindungi dengan ProtectedRoute */}
           <Route element={<ProtectedRoute />}>
+            <Route
+              path="*"
+              element={<NotFound setPageTitle={updateDocumentTitle} />}
+            />
             <Route
               path="/"
               element={<DashboardView setPageTitle={updateDocumentTitle} />}

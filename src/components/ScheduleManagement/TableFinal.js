@@ -1,5 +1,6 @@
 // path: src/components/ScheduleManagement/TableFinal.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Table,
   TableBody,
@@ -12,91 +13,48 @@ import {
   Typography,
   TextField,
 } from "@mui/material";
-
-const demoFinalData = [
-  {
-    id: 1,
-    customerName: "John Doe",
-    date: "2023-01-01",
-    location: "Jakarta",
-    products: "Produk A - Produk B",
-  },
-  {
-    id: 2,
-    customerName: "Jane Smith",
-    date: "2023-01-02",
-    location: "Bandung",
-    products: "Produk C - Produk D",
-  },
-  {
-    id: 3,
-    customerName: "Albert Tan",
-    date: "2023-01-03",
-    location: "Surabaya",
-    products: "Produk E",
-  },
-  {
-    id: 4,
-    customerName: "Lisa Wong",
-    date: "2023-01-04",
-    location: "Medan",
-    products: "Produk F - Produk G",
-  },
-  {
-    id: 5,
-    customerName: "Michael Chan",
-    date: "2023-01-05",
-    location: "Bali",
-    products: "Produk H",
-  },
-  {
-    id: 6,
-    customerName: "Susan Lee",
-    date: "2023-01-06",
-    location: "Makassar",
-    products: "Produk I - Produk J",
-  },
-  {
-    id: 7,
-    customerName: "David Park",
-    date: "2023-01-07",
-    location: "Yogyakarta",
-    products: "Produk K",
-  },
-  {
-    id: 8,
-    customerName: "Anna Kim",
-    date: "2023-01-08",
-    location: "Semarang",
-    products: "Produk L - Produk M",
-  },
-  {
-    id: 9,
-    customerName: "Paul Lim",
-    date: "2023-01-09",
-    location: "Malang",
-    products: "Produk N",
-  },
-  {
-    id: 10,
-    customerName: "Emily Wang",
-    date: "2023-01-10",
-    location: "Palembang",
-    products: "Produk O - Produk P",
-  },
-];
+import {
+  fetchAllFinalSchedules,
+  fetchFinalScheduleById,
+} from "../../redux/reducers/scheduleReducer";
+import { useNavigate } from "react-router-dom";
+import FinalScheduleDrawer from "./FinalScheduleDrawer";
 
 const TableFinal = () => {
-  const [searchTerm, setSearchTerm] = useState(""); // State for storing the search term
+  const dispatch = useDispatch();
+  const finalSchedules =
+    useSelector((state) => state.schedules.finalSchedules) || [];
 
-  const handleViewDetail = (id) => {
-    console.log("View detail for schedule ID:", id);
-  };
+  const loading = useSelector((state) => state.schedules.loading);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Fetch all final schedules on mount
+  useEffect(() => {
+    dispatch(fetchAllFinalSchedules());
+  }, [dispatch]);
 
   // Filter data based on search term
-  const filteredData = demoFinalData.filter((schedule) =>
-    schedule.customerName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = Array.isArray(finalSchedules)
+    ? finalSchedules.filter((schedule) =>
+        schedule.pelanggan?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
+  // Fungsi untuk format tanggal ke format yg mudah di baca
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "2-digit" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", options);
+  };
+
+  // 🆕 Open the drawer and fetch details
+  const handleOpenDrawer = (id) => {
+    setSelectedScheduleId(id);
+    setDrawerOpen(true);
+    dispatch(fetchFinalScheduleById(id)); // ✅ Fetch detail when opening drawer
+  };
 
   return (
     <Box>
@@ -111,20 +69,16 @@ const TableFinal = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h5" sx={{ flexShrink: 0 }}>
-          Jadwal Akhir
-        </Typography>
+        <Typography variant="h5">Jadwal Akhir</Typography>
         <TextField
-          fullWidth
           size="small"
           label="Cari Nama Pelanggan"
           variant="outlined"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)} // Update search term
+          onChange={(e) => setSearchTerm(e.target.value)}
           sx={{
             bgcolor: "white",
             borderRadius: 1,
-            ml: 2,
           }}
         />
       </Box>
@@ -132,34 +86,61 @@ const TableFinal = () => {
         <Table>
           <TableHead>
             <TableRow sx={{ bgcolor: "grey.200" }}>
-              <TableCell sx={{ fontWeight: "bold" }}>Nama Pelanggan</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Tanggal</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Sales</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Pelanggan</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Lokasi</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Produk</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>
+                Tanggal Pengiriman
+              </TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Aksi</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData.map((schedule) => (
-              <TableRow key={schedule.id}>
-                <TableCell>{schedule.customerName}</TableCell>
-                <TableCell>{schedule.date}</TableCell>
-                <TableCell>{schedule.location}</TableCell>
-                <TableCell>{schedule.products}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleViewDetail(schedule.id)}
-                  >
-                    Lihat Detail
-                  </Button>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  Loading...
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredData.length > 0 ? (
+              filteredData.map((schedule) => (
+                <TableRow key={schedule.id}>
+                  <TableCell>{schedule.sales}</TableCell>
+                  <TableCell>{schedule.pelanggan}</TableCell>
+                  <TableCell>{schedule.lokasi}</TableCell>
+                  <TableCell>{schedule.nama_produk}</TableCell>
+                  <TableCell>
+                    {formatDate(schedule.tanggal_pengiriman)}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleOpenDrawer(schedule.schedule_id)}
+                    >
+                      Kirim
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  Tidak ada data jadwal akhir.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* 📌 FinalScheduleDrawer Component */}
+      <FinalScheduleDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        scheduleId={selectedScheduleId}
+      />
     </Box>
   );
 };

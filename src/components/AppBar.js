@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // ⬅️ Import useLocation
 import {
   AppBar,
   Toolbar,
@@ -23,7 +23,11 @@ const CustomAppBar = ({ pageTitle }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation(); // ⬅️ Gunakan useLocation
   const dispatch = useDispatch();
+
+  // Daftar halaman yang tidak boleh menampilkan tombol back
+  const noBackPages = ["/", "/incoming-label", "/outgoing-label"];
 
   const { nama_lengkap, foto_profil } = useSelector(
     (state) => state.auth.profile
@@ -91,15 +95,17 @@ const CustomAppBar = ({ pageTitle }) => {
             {/* Divider Vertikal */}
             <Divider orientation="vertical" flexItem />
 
-            {/* Tombol Back */}
-            <IconButton
-              color="inherit"
-              onClick={handleBack}
-              edge="start"
-              sx={{ mx: 1 }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
+            {/* Tombol Back (disembunyikan jika halaman ada di `noBackPages`) */}
+            {!noBackPages.includes(location.pathname) && (
+              <IconButton
+                color="inherit"
+                onClick={handleBack}
+                edge="start"
+                sx={{ mx: 1 }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            )}
 
             {/* Judul Halaman */}
             <Typography

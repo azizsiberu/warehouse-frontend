@@ -28,7 +28,7 @@ const ConfirmationDetails = ({ selectedStocks }) => {
                     />
                   </Grid>
                   <Grid size={{ xs: 12, md: 10 }}>
-                    <Box>
+                    <Box sx={{ pl: 2 }}>
                       <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                         {stock.produk_nama} x {stock.jumlah}
                       </Typography>
@@ -36,13 +36,23 @@ const ConfirmationDetails = ({ selectedStocks }) => {
                         <Grid size={{ xs: 12, md: 6 }}>
                           <Grid container spacing={1}>
                             <Grid size={6}>
-                              <Typography>Warna</Typography>
-                              <Typography>Finishing</Typography>
+                              {stock.final_warna && (
+                                <Typography>Warna</Typography>
+                              )}
+                              {stock.final_finishing && (
+                                <Typography>Finishing</Typography>
+                              )}
                               <Typography>Lokasi</Typography>
                             </Grid>
                             <Grid size={6}>
-                              <Typography>: {stock.final_warna}</Typography>
-                              <Typography>: {stock.final_finishing}</Typography>
+                              {stock.final_warna && (
+                                <Typography>: {stock.final_warna}</Typography>
+                              )}
+                              {stock.final_finishing && (
+                                <Typography>
+                                  : {stock.final_finishing}
+                                </Typography>
+                              )}
                               <Typography>: {stock.final_gudang}</Typography>
                             </Grid>
                           </Grid>
