@@ -105,7 +105,7 @@ const TableFinal = () => {
               </TableRow>
             ) : filteredData.length > 0 ? (
               filteredData.map((schedule) => (
-                <TableRow key={schedule.id}>
+                <TableRow key={schedule.id || schedule.schedule_id}>
                   <TableCell>{schedule.sales}</TableCell>
                   <TableCell>{schedule.pelanggan}</TableCell>
                   <TableCell>{schedule.lokasi}</TableCell>
