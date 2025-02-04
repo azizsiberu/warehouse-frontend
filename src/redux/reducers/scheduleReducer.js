@@ -155,6 +155,9 @@ const scheduleSlice = createSlice({
     emptyStockProducts: [],
     finalSchedules: [], // 🆕 Menyimpan semua jadwal final
     finalScheduleDetails: null, // 🆕 Menyimpan detail jadwal final
+    currentFinalSchedule: null, // 🆕 Menyimpan data jadwal final sebelum konfirmasi
+    selectedStockFinal: [], // 🆕 Menyimpan produk yang dipilih untuk final schedule
+
     loading: false,
     error: null,
   },
@@ -172,6 +175,16 @@ const scheduleSlice = createSlice({
     },
     markProductAsEmpty: (state, action) => {
       state.emptyStockProducts.push(action.payload); // ✅ Tandai produk yang stoknya kosong
+    },
+    setCurrentFinalSchedule: (state, action) => {
+      state.currentFinalSchedule = action.payload;
+    },
+    resetCurrentFinalSchedule: (state) => {
+      state.currentFinalSchedule = null;
+      state.selectedStockFinal = [];
+    },
+    setSelectedStockFinal: (state, action) => {
+      state.selectedStockFinal = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -312,5 +325,10 @@ const scheduleSlice = createSlice({
 
 export const { setCurrentSchedule, clearSchedule } = scheduleSlice.actions;
 export const { markProductAsEmpty } = scheduleSlice.actions;
+export const {
+  setCurrentFinalSchedule,
+  resetCurrentFinalSchedule,
+  setSelectedStockFinal,
+} = scheduleSlice.actions;
 
 export default scheduleSlice.reducer;

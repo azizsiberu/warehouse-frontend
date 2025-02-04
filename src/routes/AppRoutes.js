@@ -25,6 +25,7 @@ import OutgoingLabelView from "../views/OutgoingLabelView";
 import ScheduleManagementView from "../views/ScheduleManagementView";
 import ScheduleDetailView from "../views/ScheduleDetailView";
 import ScheduleConfirmationView from "../views/ScheduleConfirmationView";
+import FinalScheduleConfirmationView from "../views/FinalScheduleConfirmationView";
 import NotFound from "../views/NotFoundView";
 
 import {
@@ -170,6 +171,14 @@ const AppRoutes = () => {
               path="/schedule-confirmation"
               element={
                 <ScheduleConfirmationView setPageTitle={updateDocumentTitle} />
+              }
+            />
+            <Route
+              path="/final-confirmation"
+              element={
+                <FinalScheduleConfirmationView
+                  setPageTitle={updateDocumentTitle}
+                />
               }
             />
             {/* Route untuk detail jadwal */}

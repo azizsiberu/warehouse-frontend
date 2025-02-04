@@ -1,6 +1,7 @@
 // path: src/components/ScheduleManagement/FinalScheduleDrawer.js
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Drawer,
   Box,
@@ -13,10 +14,15 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import CloseIcon from "@mui/icons-material/Close";
-import { fetchFinalScheduleById } from "../../redux/reducers/scheduleReducer";
+import {
+  fetchFinalScheduleById,
+  setCurrentFinalSchedule,
+  setSelectedStockFinal,
+} from "../../redux/reducers/scheduleReducer";
 
 const FinalScheduleDrawer = ({ open, onClose, scheduleId }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const capitalizeWords = (str) => {
     return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -41,9 +47,20 @@ const FinalScheduleDrawer = ({ open, onClose, scheduleId }) => {
     }
   }, [open, scheduleId, dispatch]);
 
-  useEffect(() => {
-    console.log("Redux State Updated:", scheduleDetail);
-  }, [scheduleDetail]);
+  // ✅ Simpan Data ke Redux Sebelum Navigasi
+  const handleConfirmClick = () => {
+    if (!scheduleDetail) {
+      alert("⚠️ Data jadwal belum tersedia!");
+      return;
+    }
+
+    // 🔥 Simpan data ke Redux
+    dispatch(setCurrentFinalSchedule(scheduleDetail));
+    dispatch(setSelectedStockFinal(scheduleDetail.product_details || []));
+
+    // 🚀 Navigasi ke halaman konfirmasi
+    navigate("/final-confirmation");
+  };
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -144,7 +161,12 @@ const FinalScheduleDrawer = ({ open, onClose, scheduleId }) => {
                         component="img"
                         src={product.product_photo}
                         alt={product.product_name}
-                        sx={{ width: "100%", borderRadius: 2 }}
+                        sx={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: 2,
+                        }}
                       />
                     </Grid>
 
@@ -251,7 +273,12 @@ const FinalScheduleDrawer = ({ open, onClose, scheduleId }) => {
 
         {/* Bagian 3: Tombol Kirim */}
         <Box>
-          <Button variant="contained" color="primary" fullWidth>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handleConfirmClick}
+          >
             Kirim
           </Button>
         </Box>
