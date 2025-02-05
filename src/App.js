@@ -22,6 +22,14 @@ if (
     replaysOnErrorSampleRate: 1.0,
   });
 }
+// Membatasi log jika dalam mode produksi
+if (process.env.REACT_APP_ENV === "production") {
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = (message, ...args) => {
+    Sentry.captureException(new Error(message), { extra: args });
+  };
+}
 
 function App() {
   return (
