@@ -8,7 +8,7 @@
     "@mui/icons-material": "^6.0.2",
     "@mui/material": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.7",
-    "@sentry/cli": "^2.34.1",
+    "@sentry/cli": "^2.41.1",
     "@sentry/react": "^8.54.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && npm run sentry:sourcemaps",
+    "build": "react-scripts build && npm run sentry:sourcemaps && npm run sentry:sourcemaps",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ajegcoid --project warehouse-frontend ./build && sentry-cli sourcemaps upload --org ajegcoid --project warehouse-frontend ./build"

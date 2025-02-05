@@ -50,3 +50,6 @@ coverage/
 
 # Ignore service worker output
 service-worker.js
+
+# Sentry Config File
+.sentryclirc
