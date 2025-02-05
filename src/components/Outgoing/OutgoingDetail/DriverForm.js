@@ -120,7 +120,7 @@ const DriverForm = ({ onSave }) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, mb: 4 }}>
+    <Box sx={{ flexGrow: 1, mb: 2 }}>
       <Typography variant="h6" gutterBottom>
         Informasi Driver dan Kendaraan
       </Typography>
@@ -132,6 +132,7 @@ const DriverForm = ({ onSave }) => {
             options={members || []}
             getOptionLabel={(option) => option.nama || ""}
             loading={loadingGudang}
+            size="small"
             value={driverField}
             onChange={handleDriverChange}
             onInputChange={handleDriverInputChange} // Tambahkan ini
@@ -151,6 +152,7 @@ const DriverForm = ({ onSave }) => {
           <Grid size={{ xs: 12, md: 6 }} key={index}>
             <Autocomplete
               freeSolo
+              size="small"
               options={members || []}
               getOptionLabel={(option) => option.nama || ""}
               loading={loadingGudang}
@@ -176,13 +178,14 @@ const DriverForm = ({ onSave }) => {
       </Grid>
 
       {/* Vehicle Fields */}
-      <Typography variant="h6" sx={{ mt: 3 }}>
+      <Typography variant="h6" sx={{ mt: 1 }}>
         Kendaraan
       </Typography>
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Autocomplete
             freeSolo
+            size="small"
             options={kendaraan || []}
             getOptionLabel={(option) =>
               typeof option === "object" ? option.nomor_polisi : option
@@ -228,6 +231,7 @@ const DriverForm = ({ onSave }) => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Autocomplete
             freeSolo
+            size="small"
             options={kendaraan || []}
             getOptionLabel={(option) =>
               typeof option === "object" ? option.jenis_kendaraan : option

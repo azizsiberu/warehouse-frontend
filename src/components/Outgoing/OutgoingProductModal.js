@@ -13,6 +13,7 @@ import {
   TableRow,
   Button,
   IconButton,
+  Tab,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { MdClose } from "react-icons/md";
@@ -30,12 +31,20 @@ const OutgoingProductModal = ({
 
   const [quantities, setQuantities] = useState({});
   // Perbarui input pengguna
-  const handleQuantityChange = (index, maxStock, value) => {
-    const quantity = Math.max(0, Math.min(maxStock, Number(value))); // Batas antara 0 dan stok tersedia
+  const handleQuantityChange = (index, maxStockReady, value) => {
+    const quantity = Math.max(0, Math.min(maxStockReady, Number(value))); // Batas antara 0 dan stok ready
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [index]: quantity,
     }));
+  };
+
+  const getStokReady = (stokTersedia, stokDipesan) => {
+    if (typeof stokTersedia !== "number" || typeof stokDipesan !== "number") {
+      console.warn("Invalid stok values:", { stokTersedia, stokDipesan });
+      return 0; // Default ke 0 jika data tidak valid
+    }
+    return Math.max(0, stokTersedia - stokDipesan);
   };
 
   useEffect(() => {
@@ -105,6 +114,16 @@ const OutgoingProductModal = ({
       )
     : 0;
 
+  const getTotalStockReady = (stockDetails) => {
+    return stockDetails
+      ? stockDetails.reduce(
+          (sum, variant) =>
+            sum + getStokReady(variant.stok_tersedia, variant.stok_dipesan),
+          0
+        )
+      : 0;
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -117,7 +136,7 @@ const OutgoingProductModal = ({
           p: 4,
           borderRadius: 2,
           width: "90%",
-          maxWidth: 500,
+          maxWidth: 700,
           maxHeight: "90vh",
           overflowY: "auto",
           boxShadow: 24,
@@ -241,45 +260,55 @@ const OutgoingProductModal = ({
                 <TableRow>
                   <TableCell>Warna</TableCell>
                   <TableCell>Finishing</TableCell>
-                  <TableCell>Stok Tersedia</TableCell>
+                  <TableCell>Tersedia</TableCell>
+                  <TableCell>Dipesan</TableCell>
+                  <TableCell>Ready</TableCell>
                   <TableCell>Jumlah Dikirim</TableCell>{" "}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {stockDetails && stockDetails.length > 0 ? (
-                  stockDetails.map((variant, index) => (
-                    <TableRow key={index} hover sx={{ cursor: "pointer" }}>
-                      <TableCell>
-                        {variant.final_warna || "Tidak Ada"}
-                      </TableCell>
-                      <TableCell>
-                        {variant.final_finishing || "Tidak Ada"}
-                      </TableCell>
-                      <TableCell>{variant.stok_tersedia}</TableCell>
+                  stockDetails.map((variant, index) => {
+                    const stokReady = getStokReady(
+                      variant.stok_tersedia,
+                      variant.stok_dipesan
+                    ); // Hitung stok_ready
 
-                      {/* Data baru */}
-                      {/* Input jumlah produk */}
-                      <TableCell>
-                        <input
-                          type="number"
-                          value={quantities[index] || ""}
-                          min={0}
-                          max={variant.stok_tersedia}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              index,
-                              variant.stok_tersedia,
-                              e.target.value
-                            )
-                          }
-                          style={{ width: "60px" }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))
+                    return (
+                      <TableRow key={index} hover sx={{ cursor: "pointer" }}>
+                        <TableCell>
+                          {variant.final_warna || "Tidak Ada"}
+                        </TableCell>
+                        <TableCell>
+                          {variant.final_finishing || "Tidak Ada"}
+                        </TableCell>
+                        <TableCell>{variant.stok_tersedia}</TableCell>
+                        <TableCell>{variant.stok_dipesan}</TableCell>
+                        <TableCell>{stokReady}</TableCell>{" "}
+                        {/* Tampilkan stok_ready */}
+                        {/* Input jumlah produk, hanya bisa diisi maksimal stok_ready */}
+                        <TableCell>
+                          <input
+                            type="number"
+                            value={quantities[index] || ""}
+                            min={0}
+                            max={stokReady} // Pastikan tidak lebih dari stok_ready
+                            onChange={(e) =>
+                              handleQuantityChange(
+                                index,
+                                stokReady,
+                                e.target.value
+                              )
+                            }
+                            style={{ width: "60px" }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4}>Tidak ada varian tersedia</TableCell>
+                    <TableCell colSpan={6}>Tidak ada varian tersedia</TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -287,7 +316,6 @@ const OutgoingProductModal = ({
           </TableContainer>
         </Box>
 
-        {/* Bagian Bawah - Total Stok */}
         {/* Bagian Bawah - Total Stok dan Tombol "Tambah ke Pengiriman" */}
         <Box
           mt={2}
@@ -297,6 +325,9 @@ const OutgoingProductModal = ({
         >
           <Typography variant="subtitle1" color="text.primary">
             Total Stok: {totalStock}
+          </Typography>
+          <Typography variant="subtitle1" color="text.primary">
+            Stok Ready: {getTotalStockReady(stockDetails)}
           </Typography>
           <Button
             variant="contained"

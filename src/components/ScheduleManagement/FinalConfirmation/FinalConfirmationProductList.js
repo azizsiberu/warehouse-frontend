@@ -27,7 +27,7 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
   }, [selectedStocks, schedule]);
 
   return (
-    <Box sx={{ mt: 3 }}>
+    <Box sx={{ mt: 3, overflow: "auto" }}>
       <Typography variant="h6" sx={{ mb: 1 }}>
         Produk yang Akan Dikirim:
       </Typography>
@@ -51,6 +51,8 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
             const warna = product.final_stock?.warna;
             const finishing = product.final_stock?.finishing;
             const lokasi = product.final_stock?.lokasi;
+            const tersedia = product.final_stock?.stok_tersedia;
+            const dikirim = product.schedule_details?.jumlah;
 
             return (
               <Grid size={{ xs: 12, md: 6 }} key={index}>
@@ -61,7 +63,11 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
                     p: 2,
                   }}
                 >
-                  <Grid container spacing={1}>
+                  <Grid
+                    container
+                    spacing={1}
+                    sx={{ justifyContent: "flex-start" }}
+                  >
                     <Grid size={{ xs: 12, md: 4 }}>
                       {/* Foto Produk */}
                       <Box
@@ -71,6 +77,8 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
                         sx={{
                           width: 150,
                           height: 150,
+                          maxWidth: "100%",
+                          maxHeight: "100%",
                           objectFit: "cover",
                           borderRadius: 1,
                         }}
@@ -92,6 +100,12 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
                             {finishing && (
                               <Typography variant="body2">Finishing</Typography>
                             )}
+                            {tersedia && (
+                              <Typography variant="body2">Tersedia</Typography>
+                            )}
+                            {dikirim && (
+                              <Typography variant="body2">Dikirim</Typography>
+                            )}
                           </Grid>
                           <Grid size={8}>
                             {warna && (
@@ -100,6 +114,16 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
                             {finishing && (
                               <Typography variant="body2">
                                 : {finishing}
+                              </Typography>
+                            )}
+                            {tersedia && (
+                              <Typography variant="body2">
+                                : {tersedia} unit
+                              </Typography>
+                            )}
+                            {dikirim && (
+                              <Typography variant="body2">
+                                : {dikirim} unit
                               </Typography>
                             )}
                           </Grid>
@@ -114,41 +138,47 @@ const FinalConfirmationProductList = ({ selectedStocks = [], schedule }) => {
                       Spesifikasi:
                     </Typography>
                     <Grid container spacing={1}>
-                      <Grid size={{ xs: 12, md: 6 }}></Grid>
-                      <Grid size={{ xs: 12, md: 6 }}></Grid>
-                      <Grid container spacing={1}>
-                        <Grid size={12}>
-                          {ukuran && (
-                            <Typography variant="body2">
-                              Ukuran: {ukuran}
-                            </Typography>
-                          )}
-                          {kain && (
-                            <Typography variant="body2">
-                              Kain: {kain}
-                            </Typography>
-                          )}
-                          {dudukan && (
-                            <Typography variant="body2">
-                              Dudukan: {dudukan}
-                            </Typography>
-                          )}
-                          {kaki && (
-                            <Typography variant="body2">
-                              Kaki: {kaki}
-                            </Typography>
-                          )}
-                          {bantalPeluk !== null && (
-                            <Typography variant="body2">
-                              Bantal Peluk: {bantalPeluk}
-                            </Typography>
-                          )}
-                          {bantalSandaran !== null && (
-                            <Typography variant="body2">
-                              Bantal Sandaran: {bantalSandaran}
-                            </Typography>
-                          )}
-                        </Grid>
+                      <Grid size={6}>
+                        {ukuran && (
+                          <Typography variant="body2">Ukuran</Typography>
+                        )}
+                        {kain && <Typography variant="body2">Kain</Typography>}
+                        {dudukan && (
+                          <Typography variant="body2">Dudukan</Typography>
+                        )}
+                        {kaki && <Typography variant="body2">Kaki</Typography>}
+                        {bantalPeluk !== null && (
+                          <Typography variant="body2">Bantal Peluk</Typography>
+                        )}
+                        {bantalSandaran !== null && (
+                          <Typography variant="body2">
+                            Bantal Sandaran
+                          </Typography>
+                        )}
+                      </Grid>
+                      <Grid size={6}>
+                        {ukuran && (
+                          <Typography variant="body2">: {ukuran}</Typography>
+                        )}
+                        {kain && (
+                          <Typography variant="body2">: {kain}</Typography>
+                        )}
+                        {dudukan && (
+                          <Typography variant="body2">: {dudukan}</Typography>
+                        )}
+                        {kaki && (
+                          <Typography variant="body2">: {kaki}</Typography>
+                        )}
+                        {bantalPeluk !== null && (
+                          <Typography variant="body2">
+                            : {bantalPeluk} buah
+                          </Typography>
+                        )}
+                        {bantalSandaran !== null && (
+                          <Typography variant="body2">
+                            : {bantalSandaran} buah
+                          </Typography>
+                        )}
                       </Grid>
                     </Grid>
                   </Box>

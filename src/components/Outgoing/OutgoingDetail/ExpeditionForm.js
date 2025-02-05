@@ -79,6 +79,7 @@ const ExpeditionForm = ({ onSave }) => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Autocomplete
             freeSolo
+            size="small"
             options={expeditions || []}
             getOptionLabel={(option) => option.nama_ekspedisi || ""}
             loading={loading}
@@ -101,6 +102,7 @@ const ExpeditionForm = ({ onSave }) => {
         {/* PIC Ekspedisi */}
         <Grid size={{ xs: 12, md: 6 }}>
           <TextField
+            size="small"
             label="Nama PIC Ekspedisi"
             fullWidth
             variant="outlined"
@@ -115,6 +117,7 @@ const ExpeditionForm = ({ onSave }) => {
         {/* Nomor HP Ekspedisi */}
         <Grid size={{ xs: 12, md: 6 }}>
           <TextField
+            size="small"
             label="Nomor HP Ekspedisi"
             fullWidth
             variant="outlined"

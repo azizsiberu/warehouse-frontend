@@ -7,7 +7,7 @@ const FinalConfirmationActions = ({ onCancel, onConfirm }) => {
     <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
       <Button
         variant="outlined"
-        color="secondary"
+        color="error"
         onClick={() => {
           console.log("❌ [FinalConfirmationActions] Tombol Batal ditekan");
           onCancel();

@@ -1,7 +1,10 @@
 //path: /src/redux/reducers/outgoingStockReducer.js
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { createOutgoingStock } from "../../services/api"; // API function
+import {
+  createOutgoingStock,
+  createOutgoingStockWithReservedReduction,
+} from "../../services/api"; // API function
 
 // Async Thunk untuk mengirim data ke backend
 export const submitOutgoingStock = createAsyncThunk(
@@ -9,6 +12,19 @@ export const submitOutgoingStock = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await createOutgoingStock(payload);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// 🆕 Async Thunk untuk pengiriman dengan pengurangan stok_dipesan
+export const submitOutgoingStockWithReservedReduction = createAsyncThunk(
+  "outgoingStock/submitOutgoingStockWithReservedReduction",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await createOutgoingStockWithReservedReduction(payload);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -72,7 +88,24 @@ const outgoingStockSlice = createSlice({
       .addCase(submitOutgoingStock.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Gagal menyimpan pengiriman.";
-      });
+      })
+      .addCase(submitOutgoingStockWithReservedReduction.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(submitOutgoingStockWithReservedReduction.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(
+        submitOutgoingStockWithReservedReduction.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error =
+            action.payload ||
+            "Gagal menyimpan pengiriman dengan pengurangan stok_dipesan.";
+        }
+      );
   },
 });
 

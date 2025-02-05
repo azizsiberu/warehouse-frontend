@@ -202,6 +202,14 @@ export const createOutgoingStock = async (payload) => {
   return response.data;
 };
 
+// 🆕 Fungsi untuk membuat outgoing stock dengan pengurangan stok dipesan
+export const createOutgoingStockWithReservedReduction = async (payload) => {
+  console.log("Payload to be sent to backend (Reserved Reduction):", payload); // Debug log
+  const response = await api.post("/api/outgoing-stocks/reserved", payload);
+  console.log("Response from backend (Reserved Reduction):", response.data); // Debug log
+  return response.data;
+};
+
 // Fungsi untuk mendapatkan semua pelanggan
 export const getCustomers = async () => {
   const response = await api.get("/api/customers/");

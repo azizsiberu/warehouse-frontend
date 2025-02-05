@@ -4,6 +4,7 @@ import { Box, Paper } from "@mui/material";
 import FinalConfirmationHeader from "./FinalConfirmationHeader";
 import FinalConfirmationProductList from "./FinalConfirmationProductList";
 import FinalConfirmationActions from "./FinalConfirmationActions";
+import DeliveryOption from "../../Outgoing/OutgoingDetail/DeliveryOption";
 
 const FinalScheduleConfirmation = ({
   schedule,
@@ -28,6 +29,7 @@ const FinalScheduleConfirmation = ({
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
         <FinalConfirmationHeader schedule={schedule} />
         <FinalConfirmationProductList selectedStocks={selectedStocks} />
+        <DeliveryOption onSave={console.log} />
         <FinalConfirmationActions onCancel={onCancel} onConfirm={onConfirm} />
       </Paper>
     </Box>
