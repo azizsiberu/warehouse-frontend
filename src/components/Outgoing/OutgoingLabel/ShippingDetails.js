@@ -59,18 +59,24 @@ const ShippingDetails = ({ selectedDestination }) => {
       <Grid container spacing={2}>
         {/* Label Kiri */}
         <Grid size={6}>
+          {selectedDestination.nama_sales && (
+            <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+              Sales
+            </Typography>
+          )}
           <Typography variant="body2" sx={{ fontWeight: "bold" }}>
             {selectedDestination.type === "gudang"
               ? "Nama Gudang"
               : "Nama Pelanggan"}
           </Typography>
+
           {selectedDestination.type === "pelanggan" && (
             <>
               <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                Alamat
+                Nomor HP
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                Nomor HP
+                Alamat
               </Typography>
             </>
           )}
@@ -78,6 +84,11 @@ const ShippingDetails = ({ selectedDestination }) => {
 
         {/* Value Kanan */}
         <Grid size={6}>
+          {selectedDestination.nama_sales && (
+            <Typography variant="body2">
+              : {selectedDestination.nama_sales}
+            </Typography>
+          )}
           <Typography variant="body2">
             :{" "}
             {selectedDestination.type === "gudang"
@@ -87,10 +98,10 @@ const ShippingDetails = ({ selectedDestination }) => {
           {selectedDestination.type === "pelanggan" && (
             <>
               <Typography variant="body2">
-                {customer?.alamat_pelanggan || "-"}
+                : {maskPhoneNumber(customer?.nomor_hp) || "-"}
               </Typography>
               <Typography variant="body2">
-                {maskPhoneNumber(customer?.nomor_hp) || "-"}
+                : {customer?.alamat_pelanggan || "-"}
               </Typography>
             </>
           )}

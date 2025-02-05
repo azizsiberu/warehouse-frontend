@@ -43,7 +43,9 @@ const DeliveryDetails = ({ deliveryData }) => {
             :{" "}
             {deliveryData.type === "kurirSendiri"
               ? deliveryData.data.driver?.nama || "-"
-              : deliveryData.data.name || "-"}
+              : deliveryData.data.name ||
+                deliveryData.data.nama_ekspedisi ||
+                "-"}
           </Typography>
           {deliveryData.type === "kurirSendiri" && (
             <Typography variant="body2">

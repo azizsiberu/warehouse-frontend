@@ -28,6 +28,15 @@ const StockManagementView = ({ setPageTitle }) => {
     dispatch(fetchWarehouses());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (finalStocks.length > 0) {
+      console.log("📦 [FETCH DATA] Final Stocks:", finalStocks);
+    }
+    if (warehouses.length > 0) {
+      console.log("🏢 [FETCH DATA] Warehouses:", warehouses);
+    }
+  }, [finalStocks, warehouses]);
+
   if (loading) {
     return <Loading />;
   }

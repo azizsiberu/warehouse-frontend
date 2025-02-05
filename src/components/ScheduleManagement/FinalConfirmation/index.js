@@ -1,4 +1,3 @@
-// path: src/components/ScheduleManagement/FinalConfirmation/index.js
 import React, { useEffect } from "react";
 import { Box, Paper } from "@mui/material";
 import FinalConfirmationHeader from "./FinalConfirmationHeader";
@@ -9,19 +8,12 @@ import DeliveryOption from "../../Outgoing/OutgoingDetail/DeliveryOption";
 const FinalScheduleConfirmation = ({
   schedule,
   selectedStocks,
-  onCancel,
   onConfirm,
+  onDeliveryData, // callback diterima dari container
+  onCancel,
 }) => {
-  // 🔍 Log debugging untuk melihat data saat komponen dimuat
   useEffect(() => {
-    console.log(
-      "📌 [FinalScheduleConfirmation] Data Jadwal Diterima:",
-      schedule
-    );
-    console.log(
-      "📌 [FinalScheduleConfirmation] Produk Terpilih:",
-      selectedStocks
-    );
+    // Log debugging jika diperlukan
   }, [schedule, selectedStocks]);
 
   return (
@@ -29,7 +21,8 @@ const FinalScheduleConfirmation = ({
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
         <FinalConfirmationHeader schedule={schedule} />
         <FinalConfirmationProductList selectedStocks={selectedStocks} />
-        <DeliveryOption onSave={console.log} />
+        {/* DeliveryOption dirender di sini, tapi datanya dikirim melalui callback onDeliveryData */}
+        <DeliveryOption onSave={onDeliveryData} />
         <FinalConfirmationActions onCancel={onCancel} onConfirm={onConfirm} />
       </Paper>
     </Box>

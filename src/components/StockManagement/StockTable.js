@@ -9,6 +9,7 @@ import {
   Paper,
   Box,
   Typography,
+  Tab,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
@@ -116,21 +117,30 @@ const StockTable = ({ stocks, loading, error }) => {
               <TableCell>Warna</TableCell>
               <TableCell>Finishing</TableCell>
               <TableCell>Gudang</TableCell>
-              <TableCell align="right">Stok Tersedia</TableCell>
+              <TableCell>Stok</TableCell>
+              <TableCell>Dipesan</TableCell>
+              <TableCell>Ready</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {stocks.map((stock, index) => (
-              <TableRow key={stock.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{stock.nama}</TableCell>
-                <TableCell>{stock.kategori}</TableCell>
-                <TableCell>{stock.final_warna}</TableCell>
-                <TableCell>{stock.final_finishing}</TableCell>
-                <TableCell>{stock.warehouse_lokasi}</TableCell>
-                <TableCell align="right">{stock.stok_tersedia}</TableCell>
-              </TableRow>
-            ))}
+            {stocks.map((stock, index) => {
+              const stokReady = stock.stok_tersedia - stock.stok_dipesan; // Hitung stok ready
+
+              return (
+                <TableRow key={stock.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{stock.nama}</TableCell>
+                  <TableCell>{stock.kategori}</TableCell>
+                  <TableCell>{stock.final_warna}</TableCell>
+                  <TableCell>{stock.final_finishing}</TableCell>
+                  <TableCell>{stock.warehouse_lokasi}</TableCell>
+                  <TableCell>{stock.stok_tersedia}</TableCell>
+                  <TableCell>{stock.stok_dipesan}</TableCell>
+                  <TableCell>{stokReady}</TableCell>{" "}
+                  {/* Tampilkan stok ready */}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

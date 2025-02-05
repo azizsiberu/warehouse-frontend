@@ -1,5 +1,6 @@
 // Path: /src/components/Outgoing/OutgoingLabel/OutgoingLabel.js
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { Box, Typography, Divider } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import ShippingDetails from "./ShippingDetails";
@@ -9,11 +10,20 @@ import SignatureFields from "./SignatureFields";
 import OutgoingLabelActions from "./OutgoingLabelActions";
 import LabelHeader from "./LabelHeader.js";
 
-const OutgoingLabel = ({
-  selectedProducts,
-  selectedDestination,
-  deliveryData,
-}) => {
+const OutgoingLabel = (props) => {
+  const location = useLocation();
+  const {
+    selectedProducts = location.state?.selectedProducts || [],
+    selectedDestination = location.state?.selectedDestination || {},
+    deliveryData = location.state?.deliveryData || {},
+  } = props;
+
+  console.log("📌 [OutgoingLabel] Data yang diterima:", {
+    selectedProducts,
+    selectedDestination,
+    deliveryData,
+  });
+
   return (
     <Box
       sx={{
