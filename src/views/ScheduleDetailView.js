@@ -14,7 +14,7 @@ const ScheduleDetailView = ({ setPageTitle }) => {
   );
 
   useEffect(() => {
-    const title = "Detail Jadwal Pengiriman";
+    const title = "Pembuatan Jadwal";
     setPageTitle(title);
     document.title = title;
 

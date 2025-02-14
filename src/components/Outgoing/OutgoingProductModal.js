@@ -31,8 +31,9 @@ const OutgoingProductModal = ({
 
   const [quantities, setQuantities] = useState({});
   // Perbarui input pengguna
-  const handleQuantityChange = (index, maxStockReady, value) => {
-    const quantity = Math.max(0, Math.min(maxStockReady, Number(value))); // Batas antara 0 dan stok ready
+  // Perbarui input pengguna untuk stok tersedia
+  const handleQuantityChange = (index, maxStockAvailable, value) => {
+    const quantity = Math.max(0, Math.min(maxStockAvailable, Number(value))); // Batas antara 0 dan stok tersedia
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [index]: quantity,
@@ -296,7 +297,7 @@ const OutgoingProductModal = ({
                             onChange={(e) =>
                               handleQuantityChange(
                                 index,
-                                stokReady,
+                                variant.stok_tersedia,
                                 e.target.value
                               )
                             }
